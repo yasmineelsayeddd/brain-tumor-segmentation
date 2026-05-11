@@ -5,19 +5,21 @@ experiment:
 
 data:
   dataset: brats2020_2d
-  data_root: data/
-  modalities: [T1, T1ce, T2, FLAIR]
+  data_root: data/brats2020_2d
+  split_file: configs/splits/default.json
+  modalities: [flair, t1, t1ce, t2]
   num_classes: 4
   image_size: 240
-  train_val_test_split: [0.7, 0.15, 0.15]
   batch_size: 16
-  num_workers: 4
+  num_workers: 2
 
 model:
   arch: unet
   in_channels: 4
   out_channels: 4
-  base_features: 32
+  base_channels: 64
+
+checkpoint_dir: checkpoints/
 
 training:
   epochs: 100
