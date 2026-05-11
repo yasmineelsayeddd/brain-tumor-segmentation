@@ -1,0 +1,37 @@
+experiment:
+  name: brats_baseline
+  seed: 42
+  output_dir: outputs/
+
+data:
+  dataset: brats2020_2d
+  data_root: data/
+  modalities: [T1, T1ce, T2, FLAIR]
+  num_classes: 4
+  image_size: 240
+  train_val_test_split: [0.7, 0.15, 0.15]
+  batch_size: 16
+  num_workers: 4
+
+model:
+  arch: unet
+  in_channels: 4
+  out_channels: 4
+  base_features: 32
+
+training:
+  epochs: 100
+  optimizer: adam
+  lr: 1.0e-3
+  weight_decay: 1.0e-5
+  scheduler: cosine
+  loss: dice_ce
+  early_stopping_patience: 15
+
+evaluation:
+  metrics: [dice, iou, hd95, accuracy]
+  save_predictions: true
+
+logging:
+  level: INFO
+  tensorboard: true

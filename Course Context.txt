@@ -1,0 +1,2581 @@
+Course Context:
+
+Page
+1
+of 48
+COMPUTER VISION COURSE
+LEC. 1
+INTRODUCTION TO IMAGE
+PROCESSING AND COMPUTER VISION
+DR.MONA M.SOLIMAN
+mona.soliman@eui.edu.eg
+COURSE OBJECTIVE
+Understand the
+basics of image
+processing and
+computer vision.
+1
+Explore key
+techniques and
+algorithms.
+2
+Learn about
+real-world
+applications.
+3
+Gain hands-on
+experience with
+tools and
+libraries
+4
+GRADING SCHEMA
+20% mid-
+term 15% lab
+assignment 15% lab
+project
+10%
+quizzes 40% final
+exam
+IMAGE PROCESSING
+• IMAGE REPRESENTION
+• IMAGE ENHANCMENT
+• IMAGE SEGMENTION
+• IMAGE MORPHOLOGY
+COMPUTER VISION
+• Sliding window
+• You Only Look Once (Yolo)
+• Mask RCNN
+• Regional CNN (RCNN)
+• U-NET
+• Video basics and object tracking
+WHAT IS IMAGE
+PROCESSING?
+• image processing is any form of signal processing
+for which the input is an image, such as a
+photograph or video frame; the output of
+image processing may be either an image or a set of
+characteristics or parameters related to the image.
+• Most image processing techniques involve treating
+the image as a two-dimensional signal and applying
+standard signal processing techniques to it.
+• DIP focuses on developing a computer
+system that algorithms and perform
+processing on an image.
+IMAGE PROCESSING APPLICATIONS
+IMAGE PROCESSING: MAIN OPERATIONS
+WHAT IS COMPUTER VISION
+• Computer vision is a field of artificial intelligence
+(AI) that :
+• •Enables computers and systems to derive
+meaningful information from digital images,
+videos and other visual inputs.
+• •Take actions or make recommendations based
+on that information.
+• •AI enables computers to think, computer vision
+enables them to see, observe and understand.
+COMPUTER
+VISION
+APPLICATIONS
+COMPUTER VISION EXAMPLES
+COMPONENTS
+OF MACHINE
+VISION SYSTEM
+Lighting
+• Illuminate the scene or object
+Camera
+• Provides a Lense or sensor to capture and digitize the image
+Processor
+• Consist of machine vision algorithms for analytics and
+processing
+Output
+• Uses data from the processor to direct robots and communicate
+information to other machines and SW.
+PART-1: Image processing
+IMAGE
+REPRESENTATION
+RGB 2 GREAYSCALE
+1. IMAGE ENHANCEMENT
+• Image enhancement is the process of
+making images more useful (such as making
+images more visually appealing, bringing
+out specific features, removing noise from
+images and highlighting interesting details
+in images
+• image enhancement transforms machine
+vision systems by simplifying data
+extraction and decision-making, leading to
+significant improvements in performance
+and accuracy
+IMAGE ENHANCEMENT METHODS
+Spatial domain: manipulates the pixels of an
+image directly. This process happens in the
+image’s coordinate system, also known as the
+spatial domain.
+Point processing methods Histogram based methods Filters based methods
+Frequency domain: transforms an image
+from the spatial domain to the frequency
+domain. In this process, Mathematical
+transformations (such as the Fourier
+transform) are used. The image can be
+modified by manipulating its frequency
+components.
+Filters based methods
+SPATIAL DOMAIN TECHNIQUES
+• Most spatial domain enhancement
+operations can be reduced to the
+form g (x, y) = T[ f (x, y)]
+where f (x, y) is the input image
+g (x, y) is the processed image
+T is some operator defined over some
+neighborhood of (x, y).
+1-POINT PROCESSING TECHNIQUES
+• When the neighborhood is pixel itself, simplest spatial
+domain operations occur. Point processing operation
+take the form
+• s = T(r) where s refers to the processed image pixel
+value and r refers to the original image pixel value.
+• Applications: Useful for enhancing white or gray
+details embedded in dark regions of the image
+1.1 NEGATIVE IMAGE
+• 1- Negative Image
+• Negative images are useful for enhancing details.
+• s = intensity_max — r
+• Example
+1.2 LOGARITHMIC TRANSFORMATIONS
+• The general form of the log
+transformation is s = c * log(1 + r)
+• The log transformation maps a
+narrow range of low input grey
+level values into a wider range of
+output values
+1.3 POWER LAW (GAMMA CORRECTION) TRANSFORMATIONS
+Power law transformations have the following form:
+Map a narrow range of dark input values into a wider
+range of output values or vice versa.
+•C is generally set to 1.
+•Grey levels must be in the range [0.0, 1.0].
+1.4 PIECEWISE LINEAR TRANSFORMATION
+FUNCTIONS
+2. HISTOGRAM BASED METHODS
+• An image histogram is a graphical
+representation of the number of pixels in
+an image as a function of their intensity.
+• Histograms are made up of bins, each
+bin representing a certain intensity value
+range. The histogram is computed by
+examining all pixels in the image and
+assigning each to a bin depending on the
+pixel intensity. The final value of a bin is
+the number of pixels assigned to it.
+2 3 4 5 6 6 9
+4 2 2 2 10 0 2
+3 3 10 9 10 0 1
+3 7 9 4 1 5 0
+6 2 8 4 1 0 5
+0 4
+1 3
+2 6
+3 4
+4 4
+5 3
+6 3
+7 1
+8 1
+9 3
+10 3
+CONTRAST STRETCHING
+• Contrast stretching (often called
+normalization) is a simple image
+enhancement technique that attempts
+to improve the contrast in an image by
+`stretching' the range of intensity
+values it contains to span a desired
+range of values, e.g. the full range
+of pixel values that the image type
+concerned allows
+EXAMPLE
+• Consider the following 5x5 grayscale image matrix, where the pixel values range from 50 to 200:
+• xmin=50
+• xmax=180
+• For 50:
+Xnew= 50−50
+180−50 𝑥255 = 0
+• For 60:
+Xnew= 60−50
+180−50 𝑥255 = 19.61 = 20
+• For 100:
+Xnew=100−50
+180−50 𝑥255 = 98.0
+2.2 HISTOGRAM EQUALIZATION
+• In many images, the pixel intensities are
+not uniformly distributed across the
+available range, leading to limited contrast
+and suboptimal perceptual clarity. Let’s
+suppose we are building an image
+processing pipeline for a self-driving car.
+HISTOGRAM EQUALIZATION ALGORITHM
+start
+Calculate the
+cumulative values
+(CDF=sum(PDF)
+Calculate pdf (nk /n)
+Get the occurrence
+frequency of gray
+values (nk)
+Calculate the equation:
+CDF*(#of gray-levels-1)
+Mapping the values
+back to gray-levels
+Equalized image object
+end
+APPLY HISTOGRAM EQUALIZATION FOR THE FOLLOWING:
+0
+20
+40
+60
+80
+100
+120
+0 1 2 3 4 5 6 7
+Histogram
+Gray-
+level nk
+PDF=n
+k/n
+CDF=sum
+(PDF)
+CDFx(L-1)
+(CDFx7)
+Rounding
+off (new
+gray-level)
+0 70 0.175 0.175 1.22 1
+1 100 0.25 0.425 2.97 3
+2 40 0.1 0.525 3.67 4
+3 60 0.15 0.675 4.72 5
+4 0 0 0.675 4.72 5
+5 80 0.2 0.875 6.12 6
+6 10 0.025 0.9 6.3 6
+7 40 0.1 1 7 7
+Total n=400
+Gray-level 0 1 2 3 4 5 6 7
+New
+histogram 0 70 0 100 40 60 90 40
+3. SPATIAL FILTERS
+Smoothing filters
+Smoothing in image processing is a
+technique used to reduce noise and
+blurring image (fine details in an image)
+e.g. removal of small details from an
+image prior to object extraction
+Sharpening filters
+Sharpening filters are a type of image
+processing that enhances the contrast
+between neighboring pixels, making the
+edges and details more visible and
+defined (edge detection)
+Image filtering: Modify the pixels in an image based on some function of a local neighborhood of the pixels
+WHAT IS NOISE
+• Random noise: consist of sharp transitions in gray levels
+• Salt and pepper noise
+Linear filters
+• Average Filter
+• Weighted average
+Non-Linear filters
+(order statistic)
+• Min
+• Max
+• Median
+• Nth order
+3. SPATIAL FILTERS
+3. SPATIAL FILTERS
+LINEAR FILTERS (AVERAGE FILTER)
+• Replace each pixel with a linear combination of its neighbors
+• This process result in image with reduced “sharp” transition in
+gray levels (noise reduction)
+• Edges is also characterized by sharp transition, so average
+filter have undesirable side effect that they blur edges
+AVERAGE FILTER
+12 16 18 35 30 28
+8 50 20 24 30 22
+2 12 3 21 34 18
+5 6 4 3 32 12
+10 1 0 4 15 23
+12 16 18 35 30 28
+8 16 20 24 30 22
+2 12 3 21 34 18
+5 6 4 3 32 12
+10 1 0 4 15 23
+12 16 18 35 30 28
+8 22 20 24 30 22
+2 12 3 21 34 18
+5 6 4 3 32 12
+10 1 0 4 15 23
+ORDER
+STATISTICS
+FILTERS
+• Non-linear spatial filters whose
+response based on ordering the
+pixel contained in the image area
+encompassed by the filter
+• Median filter: Noise reduction of
+random noise (with less blurring
+effect compared to linear filters)
+and salt and pepper noise
+• Max filter :finding the brightest
+points in an image
+• Min filter: finding the darkest points
+in an image
+ADAPTIVE LOCAL NOISE REDUCTION FILTER
+• Adaptive filter is performed on the degraded
+image that contains original image and noise. The
+mean and variance are the two statistical
+measures that a local adaptive filter depends with
+a defined mxn window region.
+ADAPTIVE LOCAL FILTER
+Results of image filtering techniques for MRI
+image (a) Original image, (b) Image with
+Gaussian noise (σ=0.005), (c) Adaptive filter,
+SHARPENING FILTERS
+• The main objective is to highlight fine details in an
+image or enhance details that has been blurred
+• Blurring vs. Sharpening
+• Blurring/smooth is done in spatial domain
+by pixel averaging in a neighbors, it is a
+process of integration.
+Sharpening is an inverse process, to find
+the difference by the neighborhood, done
+by spatial differentiation. spatial
+differentiation.
+• The strength of the response of a
+derivative operator is proportional to the
+degree of operator is proportional to the
+degree of discontinuity of the image at
+the point at which the operator is
+applied.
+• Image differentiation – enhances edges
+and other discontinuities (noise)–
+deemphasizes area with slowly varying
+gray-level values.
+SHARPENING FILTERS
+These type of filters is used to highlight the transition in intensity on edges.
+Laplacian mask (2_nd
+derivative) Sobel mask(1_st derivative)
+Note: the sum of the elements in each mask is equal to zero
+FREQUENCE DOMAIN FILTERS
+Low
+Pass
+Filter
+(LPF)
+A filter that attenuates high
+frequencies while passing low
+frequencies.- used for blurring
+(smoothing)
+High
+Pass
+Filter
+(HPF)
+A filter that attenuates low
+frequencies while passing high
+frequencies. used for
+sharpening
+FREQUENCY DOMAIN IMAGES
+IDEAL LPF
+• Ideal LPF with cutoff frequency is given by the
+following:
+• The cutoff frequency determines the amount of
+frequency passed by the filter
+• Smaller the value of r0 ,more the number of
+images components eliminated by the filter
+BUTTERWORTH LPF
+Frequency response doesn't have sharp transition as
+in ideal LPF
+GAUSSIAN LPF
+Original image Applying Gaussian low pass filter From left to right, the blurring effect increases with the variance.
+LOW PASS FILTER COMPARED
+SHARPENING FILTER
+• HPF: only pass the high
+frequencies. drop the low
+ones.
+• Sharpening is achieved by
+attenuating Low frequency
+components of DFT of an
+image. where edges are
+associated with high
+frequency component
+
+Page
+1
+of 60
+COMPUTER VISION COURSE
+LEC. 2
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+WHAT IS IMAGE SEGMENTATION?
+❑In computer vision, image segmentation is the process of partitioning an image into
+multiple segments.
+❑The goal of segmenting an image is to change the representation of an image into
+something that is more meaningful and easier to analyze.
+❑It is usually used for locating objects and creating boundaries.
+❑It is not a great idea to process an entire image because many parts in an image
+may not contain any useful information. Therefore, by segmenting the image, we
+can make use of only the important segments for processing.
+2
+APPLICATION OF IMAGE SEGMENTATION
+3
+IMAGE SEGMENTATION TECHNIQUES
+4
+IMAGE SEGMENTATION TECHNIQUES
+5
+(1) DETECTION OF DISCONTINUITIES
+EDGE DETECTION
+6
+IMAGE SEGMENTATION
+DETECTION OF DISCONTINUITIES
+•There are three kinds of discontinuities of intensity:
+points, lines and edges.
+•The most common way to look for discontinuities is to
+scan a small mask over the image. The mask
+determines which kind of discontinuity to look for.=
+=+++= 9
+1
+992211 ... i ii zwzwzwzwR
+w1 w2 w3
+w4 w5 w6
+w7 w8 w9
+7thresholdenonnegativa:where T
+TR 
+5 2 3 4
+6 4 25 4
+5 1 1 3
+4 1 3 2
+3 1 6 6
+DETECTION OF
+DISCONTINUITIES
+(EXAMPLE)25 2* 1 3* 1 4* 1
+4* 1 25*8 4* 1
+1* 1 1* 1 3* 1
+178
+R
+R
+= − + − + −
+− + + −
+− + − + −
+==
+=+++= 9
+1
+992211 ... i ii zwzwzwzwR3 1* 1 1* 1 3* 1
+1* 1 3*8 2* 1
+1* 1 6* 1 *6 1
+3
+R
+R
+= − + − + −
+− + + −
+− + − + −
+=
+8
+• An Edge: Set of connected pixels that lie on the boundary of two regions
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION
+9
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION
+10
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION
+11
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION
+12
+• First-order derivatives:
+• The gradient of an image f(x,y) at location (x,y) is defined as the vector:
+• The magnitude of this vector:
+• The direction of this vector:
+• Direction of gradient is on edge direction
+
+
+
+
+
+
+
+=
+
+
+
+
+
+= 
+
+
+
+y
+f
+x
+f
+y
+x
+G
+G
+f 
+2
+1
+22
+)(mag yx GGf +== f1
+( , ) tan y
+x
+G
+x y G
+
+−  
+=  
+ 
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION (1_ST DERIVATIVE)
+13
+Roberts cross-gradient operators
+Prewitt operators
+Sobel operators
+14
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION
+VH
+15
+X
+y y
+X
+dx Vertical
+Edges
+Horizontal
+Edges
+dy
+Direction of gradient is on edge direction
+DETECTION OF DISCONTINUITIES
+EDGE DETECTION
+16
+17
+DETECTION OF DISCONTINUITIES
+EDGE DETECTION (EXAMPLE)
+STEPS OF APPLYING 1_ST DERIVATIVE EDGE
+DETECTION
+1. Apply dx to get Gx
+2. Apply dy to get Dy
+3. Get
+4. Get
+5. Apply threshold on
+6. Output is a Binary matrix of same image size
+18 
+2
+1
+22
+)(mag yx GGf +== f1
+( , ) tan y
+x
+G
+x y G
+
+−  
+=  
+ f
+EXAMPLE-1
+Apply Sobel edge detection on the following image
+2 3 1 5
+6 0 8 2
+5 6 7 1
+19
+20
+2 3 1 5
+6 0 8 2
+5 6 7 1
+• Apply dx to get Gx
+Gx =(3*-1)+(1*0)+(5*1)+(0*-2)+(0*8)+(2*2)+(6*-1)+(7*0)+(1*1)= 1
+• Apply dy to get Dy
+Gy =(3*-1)+(1*-2)+(5*-1)+(0*0)+(0*8)+(0*2)+(6*1)+(7*2)+(1*1)= 11
+= 1 + 112 =11.04 =𝑡𝑎𝑛−1(11
+1 ) 
+2
+1
+22
+)(mag yx GGf +== f1
+( , ) tan y
+x
+G
+x y G
+ −  
+=  
+ 
+21
+6 0 6 -10
+9 5 1 -24
+12 6 -8 -22
+• The same for the whole matrix
+12 14 18 12
+9 15 11 -2
+-12 -14 -18 -12
+13.4 14 18.9 15.6
+12.7 15.8 11 24.08
+16.9 15.2 19.6 25.1
+0 0 1 1
+0 1 0 1
+1 1 1 1
+𝐺𝑥 𝐺𝑦
+∇𝑓
+Threshold =15
+Threshold
+??
+• Second-order derivatives: (The Laplacian)
+• The Laplacian of an 2D function f(x,y) is defined as2
+2
+2
+2
+2
+y
+f
+x
+f
+f 
+
++
+
+
+=
+22
+DETECTION OF DISCONTINUITIES
+EDGE DETECTION (2_ND DERIVATIVE)
+23
+The Laplacian method searches for
+zero crossings in the second
+derivative of the image to find
+edges
+DETECTION OF
+DISCONTINUITIES
+EDGE DETECTION (2_ND DERIVATIVE)
+• Apply Laplacian mask on the image
+• Find zero crossings of Laplacian - binary image (1 at crossing, 0 elsewhere)
+24
+STEPS OF APPLYING 2_ND DERIVATIVE EDGE
+DETECTION
+• # O
+* x *
+O # •
+EXAMPLE-2
+Apply Laplacian edge detection on the following image
+2 3 1 5
+6 0 8 2
+5 6 7 1
+25
+• Apply Laplacian mask
+• Apply zero-crossing
+26
+7 7 -10 29
+32 -38 39 -6
+28 22 39 -9
+2 3 1 5
+6 0 8 2
+5 6 7 1
+1 1 1 1
+1 1 1 1
+1 6 1 1
+27
+DETECTION OF DISCONTINUITIES
+(3) EDGE DETECTION (2_ND DERIVATIVE)
+• Very sensitive to noise, so it doesn’t use in this form
+• We apply LOG to detect an edge in the 2_nd derivative
+The Laplacian of a Gaussian sometimes is called the Mexican hat function. It
+also can be computed by smoothing the image with the Gaussian smoothing
+mask, followed by application of the Laplacian mask.
+• Consider the function:
+• The Laplacian of h isdeviationstandardthe:and
+where)( 2222 2
+2
+
+
+yxrerh r
++=−= −2
+2
+2
+4
+22
+2 )(
+
+
+
+r
+e
+r
+rh −
+
+
+
+
+
+ −
+−= The Laplacian of a Gaussian
+(LoG)
+A Gaussian function
+28
+DETECTION OF
+DISCONTINUITIES
+(3) EDGE DETECTION (LOG)
+29
+DETECTION OF
+DISCONTINUITIES
+(3) EDGE DETECTION (LOG)
+Original image Sobel Zero crossing of
+LOG
+UNCONNECTED EDGE PROBLEM
+31
+EDGE LINKING AND BOUNDARY DETECTION
+LOCAL PROCESSING
+• Two properties of edge points are useful for edge linking:
+• the strength (or magnitude) of the detected edge points
+• their directions (determined from gradient directions)
+• This is usually done in local neighborhoods.
+• Adjacent edge points with similar magnitude and direction
+are linked. 32
+• For example, an edge pixel with coordinates (x0,y0) in a predefined
+neighborhood of (x,y) is similar to the pixel at (x,y) if :
+&
+33thresholdenonnegativa:,),(),( 00 EEyxyxf −thresholdanglenonegativea:,),(),( 00 AAyxyx −
+
+
+Edge Linking and Boundary Detection
+Local Processing
+Edge Linking and Boundary Detection
+Local Processing: Example
+In this example,
+we can find the
+license plate
+candidate after
+edge linking
+process.
+EXAMPLE-3
+• Compute the gradient magnitude and angle of the following image using
+Sobel masks. Apply the local edge criteria with magnitude threshold=4,
+direction threshold=2
+35
+2 3 1 5
+6 0 8 2
+5 6 7 1
+SOLUTION
+1- Apply dx
+2- Apply dy
+3- Apply
+4- Apply threshold on
+5- For every one value (e.g. =1) in matrix 4
+36 
+2
+1
+22
+)(mag yx GGf +== f1
+( , ) tan y
+x
+G
+x y G
+
+−  
+=  
+ fthresholdenonnegativa:,),(),( 00 EEyxyxf −thresholdanglenonegativea:,),(),( 00 AAyxyx −
+
+
+THR. FOR MAG.=4, THR. FOR DIR.=2
+0 0 0 0
+1 0 0 0
+1 1 1 1
+37
+14 13 1 1
+18 12 11 24
+16 15 19 25
+1.1 -1.5 1.2 -0.8
+0.7 1.2 1.4 0.0
+8
+-0.7 -1.2 1.1 0.5f( , )x y
+
+• For example, pixel pos(1,0) with value 1
+• |18-14|=4 <=4 (√) |0.7-1.1|=-0.4 <2 (√)
+(√ & √ ) zero became 1
+• |18-13|=5 <=2 (x) |0.7+1.5|=2.2<2 (x)
+(x&x) zero still zero
+• |18-12|=6 <2 (x) |0.7-1.2|=1.9<2 (√)
+(x& √) zero still zero
+Threshold Matrix
+38
+Image Segmentation
+Thresholding
+❑Light objects in dark background
+❑To extract the objects:
+➢Select a T that separates the objects
+from the background
+i.e. So: (x,y) belongs:
+➢To object class
+if f(x,y)>T
+➢To the background
+if f(x,y)≤T
+39
+Image Segmentation
+Thresholding
+❑ A more general case of this approach (multilevel
+thresholding)
+So: (x,y) belongs:
+➢To First object class
+if T1<f(x,y)≤T2
+➢To the other object
+if f(x,y)>T2
+➢To the background
+if f(x,y)≤T1
+• To partition the image histogram by using a single
+threshold T.
+• Then the image is scanned and labels are assigned.
+• This technique is successful in highly controlled
+environments.
+Image Segmentation
+Simple global Thresholding
+
+
+
+
+= Tyxf
+Tyxf
+yxg ),(if0
+),(if1
+),(
+41
+42
+43
+• Based on the histogram of an image
+• Partition the image histogram using a single global threshold
+• The success of this technique very strongly depends on how well
+the histogram can be partitioned
+Image Segmentation
+Simple global Thresholding
+44
+• Imagine a poker playing robot that needs to visually interpret the
+cards in its hand
+Original Image Thresholded Image
+Image Segmentation
+Simple global Thresholding
+45
+• If you get the threshold wrong the results can be disastrous
+Threshold Too Low Threshold Too High
+Image Segmentation
+Simple global Thresholding
+46
+An algorithm used to obtain T automatically for
+global thresholding
+1. Draw image histogram
+2. Compute the average gray level values
+1 and
+2 for the
+pixels in regions G1 and G2.
+3. Compute a threshold value:T = ½[
+1 +
+2 ]
+4. Compute the binary image g(x,y)
+
+
+
+
+= Tyxf
+Tyxf
+yxg ),(if0
+),(if1
+),(
+47
+• Edges and thresholds sometimes do not give good
+results for segmentation.
+• Region-based segmentation is based on the
+connectivity of similar pixels in a region.
+• There are two main approaches to region-based
+segmentation: region growing and region splitting.
+Image Segmentation
+Region Based Segmentation
+48
+Region-Based Segmentation
+Basic Formulation
+• Let R represent the entire image region.
+• Segmentation is a process that partitions R into subregions,
+R1,R2,…,Rn, such thatRRi
+n
+i
+=
+=1
+(a)jijiRR ji = ,andallfor(c)
+niRi ,...,2,1region,connectedais(b) =niRP i ,...,2,1forTRUE)((d) ==jiji RRRRP andregionsadjacentanyforFALSE)((e) =
+49
+Region-Based Segmentation
+Region Splitting and Merging
+• Region splitting is the opposite of region growing.
+• First there is a large region (possible the entire image).
+• Then a predicate (measurement) is used to determine if the
+region is uniform.
+• If not, then the method requires that the region be split into
+two regions.
+• Then each of these two regions is independently tested by
+the predicate (measurement).
+• This procedure continues until all resulting regions are uniform.
+50
+Region-Based Segmentation
+Region Splitting
+• The main problem with region splitting is determining where to
+split a region.
+• One method to divide a region is to use a quadtree structure.
+• Quadtree: a tree in which nodes have exactly four descendants.
+51
+52
+Region-Based Segmentation
+Region Merging and Splitting Algorithm
+1. Start with the whole image as a single suggested region
+2. For each region
+1. Compute the variance
+2. If
+1. then split regions into a set of regions consider these regions as suggested
+regions for the next iteration
+2. Else, flag the region as a found region R that will not be split any more
+Next iteration
+Repeated steps until all suggested regions are flagged as regions
+After That
+There may be more than one region needed to be merged to constitude one
+region2 ( )R T
+
+
+53
+Start merging as follow:
+1. For each neighbor region R1,R2 Check the following conditions
+2. Then merge R1and R2
+3. Apply this iteratively1 1 2 2
+2
+1 2
+| ( ) ( ) |
+&
+( )
+R R S
+R R T
+ 
+ − 
+ 
+K-Means clustering algorithm is an unsupervised algorithm and it is used to segment the interest
+area from the background. It clusters, or partitions the given data into K-clusters or parts based on
+the K-centroids.
+The algorithm is used when you have unlabeled data(i.e. data without defined categories or
+groups). The goal is to find certain groups based on some kind of similarity in the data with the
+number of groups represented by K.
+Image Segmentation
+Clustering
+1.Choose the number of clusters K.
+2.Select at random K points, the centroids(not
+necessarily from your dataset).
+3.Assign each data point to the closest centroid → that
+forms K clusters.
+4.Compute and place the new centroid of each cluster.
+5.Reassign each data point to the new closest centroid.
+If any reassignment . took place, go to step 4,
+otherwise, the model is ready.
+Image Segmentation
+K-means Clustering
+K-MEANS ALGORITHM STEPS
+NUMERICAL EXAMPLE
+• Given the following greyscale image, apply k-means clustering with k=3 (1 Iteration only)
+EXAMPLE-2
+Pixel R G B
+P1 250 10 10
+P2 245 15 15
+P3 10 240 10
+P4 15 230 15
+P5 20 20 230
+P6 25 25 220
+Given the following RGB pixels, apply k-means clustering with k=4 (1 Iteration only)
+
+Page
+1
+of 31
+COMPUTER VISION COURSE
+LEC. 4
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+LOCAL FEATURE DETECTION AND
+EXTRACTION
+• Local features and their descriptors, which are a
+compact vector representations of a local
+neighborhood, are the building blocks of many
+computer vision algorithms
+• Local features refer to a pattern or distinct
+structure found in an image, such as a point, edge,
+or small image patch. They are usually associated
+with an image patch that differs from its
+immediate surroundings by texture, color, or
+intensity.
+• Examples of local features are blobs, corners, and
+edge pixels.
+APPLICATIONS
+Object tracking
+Forgery detection
+EXAMPLE
+Generating a panorama stitching
+LOCAL FEATURES
+ALGORITHM-1: HISTOGRAM OF GRADIENTS (HOG
+• The histogram of oriented gradients (HOG) is a feature
+descriptor used in computer vision and image processing for the
+purpose of object detection.
+• The technique counts occurrences of gradient orientation in localized
+portions of an image.
+• The Histogram of Oriented Gradients method has a numerous amount of
+applications ranging from autonomous vehicles to surveillance techniques to
+smarter advertising.
+HOG ALGORITHM
+1- PRE-PROCESSING
+2.CALCULATING GRADIENT IMAGE
+• To summarize, understand that gradients have a
+magnitude and direction where the magnitude is
+calculated through the maximum of the
+magnitude of the gradients from the three color
+channels and the angle is calculated from the
+angle corresponding to the maximum gradient
+out of the three channels evaluated. These can
+produce images like the ones above where it can
+detect important information and disregard the
+unnecessary parts.
+3-HISTOGRAM CALCULATION
+• To move on to the next step of the HOG algorithm, make sure
+that the image is divided into cells so that the histogram of
+gradients can be calculated for each cell. For example, if you
+have a 64x128 image, divide your image into 8x8 cells (this will
+involve a bit of tweaking and guessing!).
+• Feature descriptors will allow for a concise and succinct
+representation of particular patches of the images; taking our
+example from above, an 8x8 cell can simply be explained using
+128 numbers (8x8x2 where the last 2 are from the gradient
+magnitude and directional values). By further converting these
+numbers to calculate histograms, we allow for an image patch
+that is much more robust to noise and more compact.
+3-HISTOGRAM CALCULATION
+• For the histogram, make sure to split it up
+into nine separate bins, each corresponding
+to angles from 0–160 in increments of 20.
+Here’s an example of how an image with the
+respective gradient magnitudes and
+directions can look like (notice the arrows
+get larger depending on the magnitude).
+3-HISTOGRAM CALCULATION
+• Now, how do we decide where each pixel goes
+inside of the histogram? It’s simple. A bin is
+selected depending on the direction chosen, and
+the value that is subsequently placed inside of
+the bin is dependent on the magnitude. Note
+that if a pixel is halfway between two bins, then
+it splits up the magnitudes accordingly
+depending on their distance away from each
+respective bin. After performing this process, a
+histogram can be formed, and the bins that have
+the most weight can easily be seen.
+4- BLOCK NORMALIZATION
+5- HOG FEATURE VECTOR
+ALGORITHM-2:HARRIS
+CORNER DETECTION
+• The Harris corner detector is
+a corner detection operator that is
+commonly used in computer
+vision algorithms to extract corners
+and infer features of an image
+• Developed by Harris & Stephens
+(1988)
+• Improved robustness over earlier
+methods (e.g., Moravec).
+WHAT IS CORNER?
+❑ A corner can be interpreted as the
+junction of two edges, where an edge is a
+sudden change in image brightness.
+❑ Corners are the important features in the
+image, and they are generally termed as
+interest points which are invariant to
+translation, rotation, and illumination.
+17
+• The idea is to consider a small window
+around each pixel p in an image. We
+want to identify all such pixel windows
+that are unique. Uniqueness can be
+measured by shifting each window by
+a small amount in a given direction
+and measuring the amount of change
+that occurs in the pixel values.
+CORNER DETECTION
+• we take the sum squared difference (SSD) of
+the pixel values before and after the shift and
+identifying pixel windows where the SSD is
+large for shifts in all 8 directions. Let us define
+the change function E(u,v) as the sum of all
+the sum squared differences (SSD), where u,v
+are the x,y coordinates of every pixel in our 3
+x 3 window and I is the intensity value of the
+pixel. The features in the image are all pixels
+that have large values of E(u,v), as defined by
+some threshold.
+•
+HARRIS CORNER DETECTION MAIN EQUATION
+• We have to maximize this
+function E(u,v) for corner
+detection. That means, we have
+to maximize the second term.
+Applying Taylor Expansion to the
+above equation and using some
+mathematical steps, we get the
+final equation as:
+• We want the SSD to be large in shifts for all
+eight directions, or conversely, for the SSD
+to be small for none of the directions. By
+solving for the eigenvectors of M, we can
+obtain the directions for both the largest
+and smallest increases in SSD. The
+corresponding eigenvalues give us the
+actual value amount of these increases.
+• A score, R, is calculated for each window
+• K is a constant value
+CLASSIFICATION VIA EIGENVALUES
+• λ1 and λ2 are the eigenvalues of M. So the
+values of these eigenvalues decide whether a
+region is a corner, edge or flat.
+• When |R| is small, which happens when λ1
+and λ2 are small, the region is flat.
+• When R<0, which happens when λ1>>λ2 or
+vice versa, the region is an edge.
+• When R is large, which happens when λ1
+and λ2 are large and λ1∼λ2, the region is a
+corner.
+HARRIS CORNER DETECTION ALGORITHM
+SOLVED EXAMPLE
+FINAL RESULT
+
+Page
+1
+of 40
+Computer Vision
+course
+lec. 3
+Dr.Mona M.solima
+mona.soliman@eui.edu.eg
+Morphological image
+processing
+Preview
+• “Morphology “ – a branch in biology that deals with the form and
+structure of animals and plants.
+• “Mathematical Morphology” – as a tool for extracting image
+components, that are useful in the representation and
+description of region shape.
+• The language of mathematical morphology is – Set theory.
+• Unified and powerful approach to numerous image processing
+problems.
+• In binary images , the set elements are members of the 2-D
+integer space – Z . where each element (x,y) is a coordinate of a
+black (or white) pixel in the image.
+2
+Mathematical morphology:
+why to use?
+3
+Basic Concepts in Set Theory
+• Subset
+• Union
+• Intersection
+disjoint / mutually exclusive
+• Complement
+• Difference
+4
+Logic Operations Involving Binary
+Pixels and Images
+• The principal logic operations used in image processing
+are: AND, OR, NOT (COMPLEMENT).
+• Logic operations are preformed on a pixel by pixel basis between
+corresponding pixels (bitwise).
+• Other important logic operations :
+XOR (exclusive OR), NAND (NOT-AND)
+5
+6
+structuring element
+• A structuring element is simply a binary image (or
+mask) that allows us to define arbitrary neighborhood
+structures.
+• The two most common structuring elements (given a Cartesian grid)
+are the 4-connected and 8-connected sets,.
+7
+structuring element
+8
+Dilation\Erosion
+9
+Dilation
+• Dilation is used for expanding an element A by using structuring
+element B
+• Dilation of A by B and is defined by the following equation:
+• This equation is based on obtaining the reflection of B
+about its origin and shifting this reflection by z.
+• The dilation of A by B is the set of all displacements z,
+such that and A overlap by at least one element. Based
+On this interpretation the equation of (9.2-1) can be
+rewritten as: 10
+Dilation – Example 1
+11
+Dilation – Example 2
+12
+“Does the SE hit the set?”
+1 1 1
+1 1 1
+1 1 1
+Dilation – A More interesting
+Example
+13
+Erosion
+• Erosion is used for shrinking of element A by using
+element B (remove thin lines , isolated dots)
+• Erosion for Sets A and B in Z2, is defined by the
+following equation:
+• This equation indicates that the erosion of A by B is the set of all
+points z such that B, translated by z, is combined in A (Fully inside
+A)
+• One of the simplest uses of erosion is for eliminating irrelevant
+details (in terms of size) from a binary image. 15
+Erosion – Example 1
+16
+Erosion – Example 2
+17
+“Does the SE fit the set?”
+1 1 1
+1 1 1
+1 1 1
+Duality between dilation and
+erosion
+• Dilation and erosion are duals of each other with respect to set
+complementation and reflection. That is,
+19
+Erosion and Dilation summary
+20
+Erosion and Dilation summary
+• Dilation, in general, causes objects to dilate or grow in
+size; erosion causes objects to shrink. The amount and
+the way that they grow or shrink depend upon the choice
+of the structuring element.
+• Dilating or eroding without specifying the structural
+element makes no more sense than trying to lowpass
+filter an image without specifying the filter.
+21
+Example
+• Apply erosion using SE1,SE2
+• Apply dilation using SE1,SE2 22
+Opening And Closing
+• Opening – smoothes contours
+• Closing :Eliminates small holes and fills gaps in contours
+• These operations are dual to each other
+23
+Opening Operation
+• Opening –
+• First – erode A by B, and then dilate the result by B
+• In other words, opening is the unification of all B objects Entirely
+Contained in A
+• Consequences:
+Objects smaller than B disappear
+Other objects remain “unchanged”
+24
+Effect of Opening
+25
+26
+Closing operation
+• Closing –
+• First – dilate A by B, and then erode the result by B
+• In other words, closing is the group of points, which the
+intersection of object B around them with object A – is not empty
+27
+Effect of closing
+28
+29
+Use of opening and closing for morphological
+filtering
+30
+Example
+• Apply opening using SE1,SE2
+• Apply closing using SE1,SE2 31
+The Hit-or-Miss Transformation
+• A basic morphological tool for shape detection.
+(Looking for an object with specific shape and size)
+• Let the origin of each shape be located at its center of gravity.
+• If we want to find the location of a shape , say – X ,
+at (larger) image, say – A :
+• Let X be enclosed by a small window, say – W.
+• The local background of X with respect to W is defined as the set
+difference (W - X).
+• Apply erosion operator of A by X, will get us the set of locations of the
+origin of X, such that X is completely contained in A.
+• It may be also view geometrically as the set of all locations of the origin
+of X at which X found a match (hit) in A. 32
+The Hit-or-Miss Transformation
+Cont.
+• Apply erosion operator on the complement of A by the local background set
+(W – X).
+• Notice, that the set of locations for which X exactly fits inside A is the
+intersection of these two last operators above.
+This intersection is precisely the location sought.
+Formally:
+If B denotes the set composed of X and it’s background –
+B = (B1,B2) ; B1 = X , B2 = (W-X).
+The match (or set of matches) of B in A, denoted is:
+33
+34
+Hit-or-Miss example 1
+Hit and miss Example 2
+35
+Use the H-M transform to find the small squares in the image below. Assume
+that B1 and B2 are of the exact size to fit the small squares.
+36
+Hit and Miss Example 3
+37
+Basic Morphological Algorithms
+• 1 – Boundary Extraction
+• 2 – Region Filling
+• 3 – Extraction of Connected Components
+• 4 – Convex Hull
+• 5 – Thinning
+• 6 – Thickening
+• 7 – Skeletons
+38
+1. Boundary Extraction
+• First, erode A by B, then make set difference between A and
+the erosion
+• The thickness of the contour depends on the size of
+constructing object – B
+39
+1. Boundary Extraction
+40
+
+Page
+1
+of 29
+COMPUTER VISION COURSE
+LEC. 5
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+SCALE INVARIANT FEATURE
+TRANSFORM (SIFT)
+• The SIFT (Scale-Invariant Feature Transform) algorithm is a computer vision
+technique used for feature detection and description.
+• SIFT stands for Scale-Invariant Feature Transform and was first presented in
+2004, by D.Lowe, University of British Columbia. SIFT is invariance to image
+scale and rotation
+• It detects distinctive key points or features in an image that are robust to
+changes in scale, rotation, and affine transformations.
+• SIFT(scale invariant feature transform) works by identifying key points
+based on their local intensity extrema and computing descriptors that
+capture the local image information around those key points.
+• These descriptors can then be used for tasks like image matching, object
+recognition, and image retrieval.
+ADVANTAGE OF SIFT
+• Scale and Rotation Invariance: SIFT features are robust to changes in scale and rotation, making them suitable for a wide range
+of applications.
+• Distinctive Descriptors: The 128-dimensional descriptors are highly distinctive, allowing for accurate matching of features
+between images.
+• Robustness to Noise and Illumination Changes: SIFT features are relatively insensitive to noise and changes in illumination,
+enhancing their reliability.
+• 3D viewpoint invariance: the feature remains the same even with the change in 3D viewpoint
+• Occlusion Invariance : Handles partial occlusions of objects within the scene
+APPLICATIONS OF SIFT
+1. Object Recognition: SIFT is widely used in object recognition tasks, where the goal is to identify objects in images regardless of their
+orientation, scale, or viewpoint. By matching SIFT features between a target image and reference images, objects can be reliably identified.
+2. Image Stitching: In panoramic photography and image stitching, SIFT is employed to find corresponding points between overlapping
+images. These matching points are then used to align and blend the images seamlessly, creating a single, wide-angle view.
+3. 3D Reconstruction: SIFT is used in 3D reconstruction to identify matching points between images taken from different angles. These
+matches are used to triangulate the positions of points in 3D space, enabling the reconstruction of the scene's 3D structure.
+4. Robot Navigation: SIFT can be used for navigation and mapping by autonomous robots. By detecting and matching features in the
+environment, robots can localize themselves and build maps of their surroundings.
+5. Image Retrieval: It involves finding images similar to a given query from a large database
+EXAMPLE OF SIFT
+Take a look at the below collection of images
+and think of the common element between
+them:
+The resplendent Eiffel Tower, of course! The
+keen-eyed among you will also have noticed
+that each image has a different background, is
+captured from different angles, and also has
+different objects in the foreground (in some
+cases).
+SIFT MAIN PROCESS
+MAIN STEPS OF SIFT
+STEP-1: GENERATE OCTAVES OF THE INPUT
+IMAGE
+• Goal: Detect features at different scales (sizes).
+• Process:
+• The original image is repeatedly blurred using Gaussian filters.
+• Images are also downsampled to create smaller versions.
+• These groups are called octaves.
+• Octave 1 (SAME SCALE)
+• Image with σ = 1
+• Image with σ = 1.6
+• Image with σ = 2
+• Octave 2
+• Image size reduced to half
+Result:
+The algorithm can detect features whether the object is large or small.
+OCTAVES GENERATION
+GAUSSIAN FILTERATION
+• For every pixel in an image, the
+Gaussian Blur calculates a value based
+on its neighboring pixels with a certain
+sigma value. Below is an example of an
+image before and after applying the
+Gaussian Blur. As you can see, the
+texture and minor details are removed
+from the image, and only the relevant
+information, likethe shape and edges,
+remain:
+SCALE VARIANT FEATURES
+• Gaussian Blur helped in image processing and
+successfully removed the noise from the
+images, and we have highlighted the
+important features of the image. Now, we
+need to ensure that these features are scale-
+dependent. This means we will be searching
+for these features on multiple scales by
+creating a ‘scale space’.Hence, these blur images are created for multiple scales. To create
+a new set of images of different scales, we will take the original
+image and reduce the scale by half. For each new image, we will
+create blur versions as we saw above.
+Here is an example to understand it in a better manner. We have
+the original image of size (275, 183) and a scaled image of
+dimension (138, 92). For both images, two blur images are
+created:
+SCALE VARIANT FEATURES
+STEP-2: KEYPOINT DETECTION (AT DIFFERENT
+SCALES)
+• Now SIFT detects candidate keypoints using Difference of Gaussian (DoG).
+• Process:
+• Subtract two Gaussian blurred images:
+• 𝐷𝑜𝐺 = 𝐺 𝑥 𝑦 𝜎1 − 𝐺 𝑥 𝑦 𝜎2
+• For every pixel, compare it with 26 neighbors:
+• 8 neighbors in the same image
+• 9 neighbors in the scale above
+• 9 neighbors in the scale below
+• If the pixel is maximum or minimum, it becomes a keypoint candidate
+• Result:
+Important points like corners and blobs are detected.
+KEY POINT DETECTION
+• We need to identify the most distinct features in a given input image while
+ignoring any noise. Additionally, we need to ensure that the features are not
+scale-dependent.
+• Gaussian Filter at different scale (To illuminate noise) (already done in step-1)
+• Diffrenation to get edge points
+SCALE-SPACE
+EXTREMA
+DETECTION-STEP 1
+• SIFT algorithm uses Difference of
+Gaussians which is an approximation
+of LoG. Difference of Gaussian is
+obtained as the difference of
+Gaussian blurring of an image with
+two different σ, let it be σ and kσ. This
+process is done for different octaves
+of the image in Gaussian Pyramid
+KEY POINT
+DETECTION
+• Once this DoG are found, images
+are searched for local extrema over
+scale and space. For eg, one pixel
+in an image is compared with its 8
+neighbours as well as 9 pixels in
+next scale and 9 pixels in previous
+scales. If it is a local extrema, it is a
+potential keypoint. It basically
+means that keypoint is best
+represented in that scale. It is
+shown in below image:
+STEP-3: REFINEMENT OF DETECTED KEYPOINTS
+▪ So far, we have successfully generated scale-invariant keypoints. But some of these
+keypoints may not be robust to noise. This is why we need to perform a final check to make
+sure that we have the most accurate keypoints to represent the image features.
+• SIFT removes unstable points using:
+• Low contrast removal
+• Edge response elimination
+• Result:
+Only stable and reliable keypoints remain.
+KEY POINT SELECTION (REFINEMENT)
+Hence, we will eliminate the keypoints that have low contrast or lie very
+close to the edge.
+• To deal with the low contrast keypoints, a second-order Taylor expansion is
+computed for each keypoint. If the resulting value is less than 0.03 (in
+magnitude), we reject the keypoint.
+STEP-4: ASSIGNING ORIENTATION TO
+KEYPOINTS
+At this stage, we have a set of stable keypoints for the images. We will now
+assign an orientation to each of these keypoints so that they are invariant to
+rotation. We can again divide this step into two smaller steps:
+• Calculate the magnitude and orientation
+• Create a histogram for magnitude and orientation
+ASSIGNING
+ORIENTATION TO
+KEYPOINTS
+To achieve detection which is invariant with respect to the
+rotation of the image, orientation needs to be calculated
+for the key-points. This is done by considering the
+neighborhood of the keypoint and calculating the
+magnitude and direction of gradients of the
+neighborhood. Based on the values obtained, a
+histogram is constructed with 36 bins to represent 360
+degrees of orientation(10 degrees per bin). Thus, if the
+gradient direction of a certain point is, say, 67.8
+degrees, a value, proportional to the gradient
+magnitude of this point, is added to the bin representing
+60-70 degrees. Histogram peaks above 80% are
+converted into a new keypoint are used to decide the
+orientation of the original keypoint
+STEP-4: ASSIGNING ORIENTATION TO
+KEYPOINTS
+4.1 Select Neighborhood Around Keypoint
+• Take a region around the keypoint (usually a circular window)
+• The size depends on the scale (σ) at which the keypoint was detected
+Larger scale → larger neighborhood
+4.2 Compute Image Gradients
+• For each pixel in the neighborhood, compute:
+• These give:
+• Strength of edge → magnitude
+• Direction of edge → orientation
+4.3 Apply Gaussian Weighting
+• Not all pixels are equally important.
+• Pixels closer to the keypoint are more important
+• So we multiply magnitude by a Gaussian:
+• This reduces noise and emphasizes the center.
+STEP-4: ASSIGNING ORIENTATION TO
+KEYPOINTS
+4.4 Create Orientation Histogram
+• Divide orientations into 36 bins
+• Each bin represents 10° (360° / 36)
+0°–10°, 10°–20°,….., 350°–360
+• For each pixel:
+• Add its weighted magnitude to the corresponding bin
+Result: a histogram showing dominant directions
+STEP-4: ASSIGNING ORIENTATION TO
+KEYPOINTS
+4.5 Find Dominant Orientation
+• The highest peak in the histogram = main orientation
+• This becomes the keypoint orientation
+4.6 Handle Multiple Orientations (Important!)
+• If there are other peaks ≥ 80% of the highest peak:
+Create multiple keypoints at the same location
+Each with a different orientation
+This improves matching for complex structures
+STEP-4: ASSIGNING ORIENTATION TO
+KEYPOINTS
+STEP-5: KEY POINT
+DESCRIPTOR
+Finally, for each keypoint, a descriptor is created using the
+keypoints neighborhood. These descriptors are used to
+match key points across images. A 16×16 neighborhood
+of the keypoint is used for defining the descriptor of that
+key-point. This 16×16 neighborhood is divided into sub-
+block. Each such sub-block is a non-overlapping,
+contiguous, 4×4 neighborhood. Subsequently, for each
+sub-block, an 8 bin orientation is created similarly as
+discussed in Orientation Assignment. These 128 bin
+values (16 sub-blocks * 8 bins per block) are represented
+as a vector to generate the keypoint descriptor.
+SIFT ALGORITHM
+VISUALIZATION OF KEYPOINT ATTRIBUTES
+
+Page
+1
+of 24
+COMPUTER VISION COURSE
+LEC. 6
+OBJECT DETECTION, LOCALIZATION, AND CLASSIFICATION
+mona.soliman@eui.edu.eg
+DIFFERENCE BETWEEN OBJECT
+CLASSIFICATION,
+LOCALIZATION, AND DETECTION
+• Object classification (One object): Predict the
+type or class of an object in an image
+• Object localization and classification(one Object):
+Locate the presence of objects in an image and
+indicate their location with a bounding box.
+Define to which class this object belongs
+• Object Detection (Multiple Object): Locate the
+presence of objects with a bounding box and
+identified them
+• Instance Segmentation: is a deep learning-
+driven computer vision task that predicts the exact
+pixel-wise boundaries of each individual object
+instance in an image.
+OBJECT DETECTION, LOCALIZATION, AND
+CLASSIFICATION
+OBJECT CLASSIFICATION
+OBJECT LOCALIZATION
+• Normalized image width and
+height (1,1)
+CLASSIFICATION, AND LOCALIZATION
+LOSS FUNCTION
+LOSS FUNCTION
+DETECTION OF MULTIPLE OBJECT
+•Sliding window
+•You Only Look Once (YOLO)
+•Regional CNN (RCNN)
+(RCNN,Fast RCNN, Faster
+RCNN)
+1. SLIDING WINDOW
+ALGORITHM
+• The idea is to crop the image into multiple
+segment/grids and run image classification for each
+cropped images to determine if there is an object
+present in this cropped image or not. We can choose a
+rectangular region with fixed length and fixed height,
+that will ‘slide’ across left to right and top to bottom,
+and each time the cropped image will pass to a pre-
+trained image classifier, that algorithm is called ‘sliding
+window approach for object detection’.
+1-SLIDING WINDOW
+• Different moving window size (with
+stride)
+• OR different image scale with
+fixed window size)
+1-SLIDING WINDOW
+Classical Classifier
+Deep Learning
+Classifier
+CLASSICAL CLASSIFICATION
+Feature
+extraction
+(HoG,SIFT,…)
+F
+e
+a
+t
+u
+r
+e
+s
+Binary Classifier
+(SVM,NN,…)
+CAR
+Not CAR
+CLASSIFICATION USING CNN
+FILTER VECTROZATION
+
+Page
+1
+of 22
+COMPUTER VISION COURSE
+LEC. 7
+QUALITY OF OBJECT LOCALIZATION
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+WHICH MODEL IS BETTER??
+Ground truth
+Model-1
+Model-3
+Model-2
+Model-4
+Each Bounding box is defined by (x,y,W,H) 0r ((x1, y1),(x2, y2))
+INTERSECTION OVER UNION (IOU)
+• Intersection over Union (IoU) is used to evaluate the performance of
+object detection by comparing the ground truth bounding box to the
+predicted bounding box
+• To apply Intersection over Union to evaluate an (arbitrary)
+object detector we need:
+➢ The ground-truth bounding boxes (i.e., the hand-
+labeled bounding boxes from the testing set that
+specify where in the image our object is).
+➢ The predicted bounding boxes from our model.
+In the numerator, we compute the area of
+overlap between the predicted bounding box and
+the ground-truth bounding box.
+The denominator is the area of union, or more simply, the
+area encompassed by both the predicted bounding box
+and the ground-truth bounding box.
+Dividing the area of overlap by the area of union yields our
+final score — the Intersection over Union.
+INTERSECTION OVER UNION (IOU)
+• The Intersection over Union (IoU) equation measures the overlap between
+two boundaries, such as a predicted bounding box and a ground-truth box. It
+is a fundamental metric in computer vision for evaluating object detection and
+image segmentation models.
+INTERSECTION OVER UNION (IOU)
+INTERSECTION OVER UNION (IOU) CALCULATION
+X11,Y11
+X21,Y21
+X12,Y12
+X22,Y22
+• With the provided boxes A and B
+• 𝑖𝑛𝑡𝑒𝑟𝑠𝑒𝑐𝑡𝑖𝑜𝑛 𝑎𝑟𝑒𝑎 (𝐴 ∩ B)= intersection width*intersection height
+• Intersection width=m𝑖𝑛(𝑥12, 𝑥22) − max(𝑥21, 𝑥11)
+• Intersection Hight=m𝑖𝑛(𝑦12, 𝑦22) − max(𝑦21, 𝑦11)
+• Union area (𝐴 ∪ B) = (𝑥12 − 𝑥11) ∗ (𝑦12 − 𝑦11)
++ (𝑥22 − 𝑥21) ∗ (𝑦22 − 𝑦21)
+- intersection area
+IoU=𝐴𝑅𝐸𝐴(𝐴∩ B)
+𝐴𝑅𝐸𝐴 (𝐴∪B)
+X
+Y
+EXAMPLE • With the provided boxes A and B
+• Intersection width=m𝑖𝑛(200,220) − max(80,50)=200-80=120
+• Intersection Hight=m𝑖𝑛(310,300) − max(120,100)=300-120=180
+• 𝑖𝑛𝑡𝑒𝑟𝑠𝑒𝑐𝑡𝑖𝑜𝑛 𝑎𝑟𝑒𝑎 (𝐴 ∩ B)= 120*180=21,600
+• Union area (𝐴 ∪ B) = (200−50) ∗ (300 − 100)
++ (220−80) ∗ (310 − 120)
+- intersection area=150*200+140*190-21,600
+IoU=21600
+35000=0.61
+PROPERTIES OF IOU
+IoU has several important properties that make it a robust metric for
+evaluating object detection performance:
+• Non-negativity: IoU values are always greater than or equal to zero
+• Symmetry: The value of IoU is the same regardless of the order in which the
+two shapes are compared
+• Scale Insensitivity: IoU is invariant to the scale of the shapes being
+compared, making it a versatile metric
+IOU LIMITATIONS
+IoU is essential for assessing the accuracy of object detection models, as it
+quantifies how well the predicted bounding boxes match the ground truth
+boxes. However, it does have limitations, such as providing no information
+about the distance between non-overlapping boxes. Various extensions and
+alternatives to IoU, like GIoU, DIoU, CIoU, and others, have been developed to
+address these limitations and improve the performance of object detection
+algorithms.
+IOU LOSS FUNCTION
+• The higher IoU, the better the performance’
+• It is required to maximalize IoU of the model output
+• Minimizes IoU loss using gradient descent
+• The problem with the IoU (above) loss function is that if there are no overlaps between
+ground truth and prediction, the IoU is zero, and the gradient is also zero – why is the
+gradient zero?
+When IoU is zero, the loss will be 1 (one minus zero), which is constant. Hence with no
+change in loss, the gradient will be zero.
+• The gradient is zero in case of no overlap; this is not a good loss function because the initial
+predictions (during training) will likely be in that situation.
+• Can we modify the above equation to use it as a proper loss function?
+IOU LOSS FUNCTION PROBLEM
+THE PROBLEM WITH IOU LOSS
+• No Gradient for Non-Overlapping Boxes: The biggest issue with IoU loss is that if
+the predicted bounding box and the ground truth box don’t overlap at all, the IoU is
+zero. This means the gradient of the loss is also zero, providing no information to
+the model about how to adjust the predicted box to move closer to the ground
+truth. This is a problem, especially during early training when predictions are often
+far off.
+• Doesn’t Distinguish Between Close and Far: IoU only measures the area of overlap.
+It doesn’t tell you anything about how close the boxes are if they don’t overlap. A
+prediction that’s slightly off and a prediction that’s very far away both result in an
+IoU of zero, even though the slightly off prediction is clearly better.
+GENERALIZED IOU (GIOU)
+• GIoU calculates a ratio between the area occupied by the smallest enclosing box(C)
+excluding the predicted and ground truth boxes, and divides by the total area
+occupied by C.
+here:
+• C is the smallest box covering both the predicted box (B) and the ground truth box
+(A)
+• This additional term provides a gradient even when there is no overlap, improving
+optimization during training.
+• 𝐼𝑜𝑈 = |𝐴∩𝐵|
+|𝐴∪𝐵|
+• 𝐺 𝐼𝑜𝑈 = 𝐼𝑜𝑈 − |𝐶−𝐴∪𝐵|
+|𝐶|
+• 𝑙𝑜𝑠𝑠𝐺𝐼𝑜𝑈 = 1 − 𝐺𝐼𝑜𝑈
+• 𝐿𝑜𝑠𝑠𝐺𝐼𝑜𝑈 = 1 − 𝐼𝑜𝑈 + |𝐶−𝐴∪𝐵|
+|𝐶|
+GENERALIZED IOU (GIOU)
+• GIoU depends on how far the prediction and the ground boxes are.
+• Even if IoU is zero, it has a gradient to push the bounding box towards the ground truth
+PROBLEM WITH GENERALIZED IOU (GIOU)
+• Inaccurate regression: IoU does not always prioritize making the predicted box fit tightly around
+the object. It focuses on reducing the overall area of the smallest enclosing box rather than
+directly improving overlap. This can lead to inaccurate bounding boxes, especially in complex
+object shapes.
+DISTANCE IOU(DIOU)
+d2 : square distance between two centers
+C2: square length of diagonal of C
+• DIoU=IoU - 𝑑2
+𝐶2
+• 𝐿𝑜𝑠𝑠𝐷𝐼𝑜𝑈 = 1 − 𝐼𝑜𝑈 + 𝑑2.
+𝐶2
+PROBLEM WITH DIOU
+d2 : Same distance
+C2: same square length of diagonal of C
+Same DIoU but Box(1) is better than Box(2)
+The aspect ratio of boxes is not taken into consideration
+COMPLETE IOU (CIOU)
+C IoU = 𝐼𝑜𝑈 − 𝑑2
+𝑐2 − 𝛼𝑣
+Orientation v= 4
+𝜋2 (arctan 𝑤𝑔𝑡
+ℎ𝑔𝑡 − arctan 𝑤
+ℎ )
+2
+𝛼 = 𝑣
+1 − 𝐼𝑜𝑈 + 𝑣
+𝐿𝑜𝑠𝑠𝐶𝐼𝑂𝑈 = 1 − 𝐼𝑜𝑈 + 𝑑2
+𝑐2 + 𝛼𝑣
+ADVANTAGES OF COMPLETE IOU (CIOU)
+•Better Overlap Maximization: It directly considers the IoU
+between predicted and ground truth boxes.
+•Distance Penalty: It reduces the distance between the center
+points of the predicted and ground truth boxes.
+•Aspect Ratio Consistency: It ensures that the predicted
+bounding box has a shape similar to the ground truth.
+
+Page
+1
+of 51
+COMPUTER VISION COURSE
+LEC. 8
+YOLO [YOU ONLY LOOK ONCE]
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+YOLO
+• YOLO (You Only Look Once) is a real-time object detection algorithm
+developed by Joseph Redmon and Ali Farhadi in 2015.
+• It is a single-stage object detector that uses a convolutional neural network
+(CNN) to predict the bounding boxes and class probabilities of objects in
+input images.
+YOLO OUTPUT
+YOLO OUTPUT
+YOLO OUTPUT
+YOLO OUTPUT
+YOLO OUTPUT
+OBJECT DETECTION DATASETS:
+1- VOC
+• The PASCAL VOC (Visual Object
+Classes) dataset is a well-known
+object detection, segmentation, and
+classification dataset. It is
+designed to encourage research on
+a wide variety of object categories
+and is commonly used for
+benchmarking computer vision
+models
+OBJECT DETECTION DATASETS:
+2- MS COCO
+• The MS COCO (Microsoft Common
+Objects in Context) dataset is a large-
+scale object detection, segmentation,
+key-point detection, and captioning
+dataset. The dataset consists of 328K
+images with 80 classes
+3- OBJECT DETECTION DATASETS:
+IMAGENET
+• The ImageNet project is a large
+visual database designed for use in visual
+object recognition software research. More
+than 14 million images have been hand-
+annotated by the project to indicate what
+objects are pictured and in at least one
+million of the images, bounding boxes are
+also provided. ImageNet contains more than
+20,000 categories, with a typical category,
+such as "balloon" or "strawberry", consisting
+of several hundred images.[4] ImageNet is a
+large database or dataset of over 14
+million images. Images are organized and
+labelled in a hierarchy.
+DETECTION OF MULTIPLE OBJECT
+•Sliding window
+•You Only Look Once (YOLO)
+•Regional CNN (RCNN)
+(RCNN,Fast RCNN, Faster
+RCNN)
+REVIEW: SLIDING WINDOW
+Classical Classifier
+Deep Learning
+Classifier
+❑ More window sizes, the more accurate W ,H OF the object
+❑ The smoother the sliding, the more accurate the position of the object
+❑ But this means very slow performance
+YOLO
+❑You Only Look Once (YOLO) is a state-of-the-art, real-time object detection algorithm introduced in
+2015.
+❑Some of the reasons why YOLO is leading the competition include its:
+• Speed
+• Detection accuracy
+• Good generalization
+• Open-source
+❑ The YOLO algorithm divides the input image into a grid of cells, and for each cell, it predicts the
+probability of the presence of an object and the bounding box coordinates of the object. It also
+predicts the class of the object.
+SINGLE-
+SHOT
+OBJECT
+DETECTION
+• Single-shot object detection is a type of object detection
+algorithm that is able to detect objects within an image or video
+in a single pass without the need for multiple stages or region
+proposals.
+• Single-shot object detectors, such as YOLO (You Only Look Once)
+use a single convolutional neural network (CNN) to directly
+predict the class labels and bounding boxes of objects within an
+image or video. These models are trained end-to-end using a
+large dataset of labeled images and their associated object-
+bounding boxes.
+• Single-shot object detection is considered faster and more
+efficient than two-shot object detection methods, as it
+eliminates the need for multiple stages and can be run in real
+time on even low-powered devices. However, it may not have
+the same level of accuracy as the multi-stage methods.
+YOLO
+YOLO (You Only Look Once) is a real-time object detection algorithm
+developed by Joseph Redmon and Ali Farhadi in 2015. It is a single-stage
+object detector that uses a convolutional neural network (CNN) to predict
+the bounding boxes and class probabilities of objects in input images.
+MAIN IDEA
+OF YOLO
+• Divide the image into sxs cells
+• Annotation
+• Annotate all objects with a bounding box and define the object class
+• Define the center of each bounding box
+• Associate each bounding box with a cell that contains its center
+• Construct a label vector for each cell that contains:
+• Coordinates (x,y,W,H) of bounding box (Exact location of object (x,y), exact size of object
+(H,W), Class of the object (C1,C2,..), Confidence value that there is an object center in this
+cell (Pc)
+YOLO TRAINING MODEL
+YOLO Model is trained to Predict:
+For Each Cell:
+•Is there an object in this cell (P_c)
+•Exact Location of Object (x, y)
+•Exact Size of Object (W, H)
+•Object Class (C_1, C_2,……) [same as Sliding Window]
+• Main Problem:
+• The same object may be predicted in multiple cells
+• A cell contains multiple objects
+YOLO OUTPUT
+YOLO ALGORITHM
+The algorithm works based on the following
+four approaches:
+• Residual blocks
+• Bounding box regression
+• Intersection Over Unions (IoU )
+• Non-Maximum Suppression.
+1. RESIDUAL BLOCKS
+This first step starts by dividing the
+original image (A) into NxN grid cells of
+equal shape, where N, in our case, is 4,
+as shown in the image on the right. Each
+cell in the grid is responsible for
+localizing and predicting the class of the
+object that it covers, along with the
+probability/confidence value.
+2- BOUNDING BOX REGRESSION
+• The next step is to determine the bounding boxes corresponding to rectangles, highlighting
+all the objects in the image. We can have as many bounding boxes as there are objects
+within a given image.
+• YOLO determines the attributes of these bounding boxes using a single regression module
+in the following format, where Y is the final vector representation for each bounding box
+• This is especially important during the training phase of the model.
+2- BOUNDING BOX REGRESSION
+• Pc corresponds to the probability score of the grid
+containing an object. For instance, all the grids in red
+will have a probability score higher than zero. The
+image on the right is the simplified version since the
+probability of each yellow cell is zero (insignificant).
+• bx,by : are the x and y coordinates of the center of the
+bounding box with respect to the enveloping grid cell.
+• bh,bw correspond to the height and the width of the
+bounding box with respect to the enveloping grid cell.
+• c1,c2 correspond to the two classes, Player and Ball.
+We can have as many classes as your use case
+requires.
+ENCODING OF OBJECT COORDINATE
+1- CELL BASED ENCODING
+• Image is divided into grid cells (each grid box is associated with one object
+center)
+• For each cell
+• (0,0) is the top left corner
+• (1,1) is the bottom right corner
+• bx,by are relative to top left corner of the cell
+• bx,by ranges from [0-1]
+• Bw,bh may exceeds 1
+EXAMPLE (CELL BASED ENCODING)
+ENCODING OF OBJECT COORDINATE
+2- IMAGE BASED ENCODING
+• Image is divided into grid cells (each grid box is associated with one object
+center)
+• For each cell
+• (0,0) is the top left corner of image
+• (S,S) is the bottom right corner of image
+• bx,by are relative to top left corner of the image
+• hx,wy ranges from [0-S]
+• Width and height ranges from (0 to S)
+(0,0)
+(S,S)
+EXAMPLE (IMAGE BASED ENCODING)
+Y=[1,3.5,3.5,3/2,1,c1,c2]
+3- INTERSECTION OVER UNION (IOU)
+INTERSECTION OVER UNION (IOU) CALCULATION
+X11,Y11
+X21,Y21
+X12,Y12
+X22,Y22
+• With the provided boxes A and B
+• 𝑖𝑛𝑡𝑒𝑟𝑠𝑒𝑐𝑡𝑖𝑜𝑛 𝑎𝑟𝑒𝑎 (𝐴 ∩ B)= intersection width*intersection height
+• Intersection width=m𝑖𝑛(𝑥12, 𝑥22) − max(𝑥21, 𝑥11)
+• Intersection Hight=m𝑖𝑛(𝑦12, 𝑦22) − max(𝑦21, 𝑦11)
+• Union area (𝐴 ∪ B) = (𝑥12 − 𝑥11) ∗ (𝑦12 − 𝑦11)
++ (𝑥22 − 𝑥21) ∗ (𝑦22 − 𝑦21)
+- intersection area
+IoU=𝐴𝑅𝐸𝐴(𝐴∩ B)
+𝐴𝑅𝐸𝐴 (𝐴∪B)
+X
+Y
+NON-MAX SUPPRESSION
+• Non Maximum Suppression is a computer
+vision method that selects a single entity out
+of many overlapping entities (for example
+bounding boxes in object detection). The
+criteria is usually discard entities that are
+below a given probability bound
+• Non-maximum suppression (NMS) is a post-
+processing technique used in object
+detection to eliminate duplicate detections
+and select the most relevant detected
+objects. This helps reduce false positives
+and the computational complexity of a
+detection algorithm.
+NMS ALGORITHM
+1. .Discard all bounding boxes with Pc<0.6 (low probability to be an object)
+2. .Select one box with the highest Pc
+3. Calculate IoU (DIoU) between selected box and all other boxes
+4. Discard Boxes with IoU >0.5 (Highly overlapped with selected box)
+5. Repeat 2,3,4 excluding the previously selected predicted box
+6. .Stop when there is no box to discard
+NMS ALGORITHM
+• The idea behind NMS is straightforward.
+It works by comparing the confidence
+scores of the proposed bounding boxes
+and eliminating the ones that overlap
+significantly with a higher-scoring
+bounding box.
+• NMS helps to reduce the number of false
+positives and improves the overall detection
+accuracy of the model. Without NMS, the
+model may generate multiple bounding box
+predictions for the same object, leading to
+duplication in the output and a decrease in
+accuracy.
+NON-MAX SUPPRESSION (NMS)
+EXAMPLE
+The NMS Iteration Process
+Step 1: Remove any box with Pc<0.6
+Step 2: Process Box A (Highest Confidence)
+•We keep Box A as a final prediction.
+•Now, we calculate the Intersection over Union (IoU) between Box A and all remaining boxes (B, C, and D).
+•Box B vs A: Boxes A ([100, 100, 210, 210]) and B ([105, 105, 215, 215]) are almost identical. Their overlap is
+very high (likely > 0.8). Since IoU > 0.5, Box B is suppressed (removed).
+•Box D vs A: Box D ([102, 102, 208, 208]) is actually inside Box A. Their overlap is extremely high. Since IoU >
+0.5, Box D is suppressed (removed).
+•Box C vs A: Box A is in the top-left (100s range) and Box C is in the bottom-right (300s-400s range). They do not
+overlap at all (IoU = 0). Box C remains for the next round.
+NEXT ITERATION
+• Process Box C (Next Highest Remaining)
+• Since Box B and D are already gone, the only remaining box to check is Box C.
+• We keep Box C as a final prediction.
+• There are no more boxes to compare against.
+FINAL OUTPUT
+Box ID Confidence Status
+Box A 0.9 Kept (Highest confidence)
+Box C 0.7 Kept (No overlap with Box A)
+Box B 0.8 Removed (Overlaps with A)
+Box D 0.6 Removed (Overlaps with A)
+ANCHOR BOXES FOR MULTIPLE
+OBJECT DETECTION
+• Remember:
+• max number of detected objects = cell count (each object
+in training is assigned to the grid cell that contains that
+object’s midpoint)
+WHAT IF THERE ARE MULTIPLE OBJECTS IN THE GRID??
+• Overlapped objects in the same grid
+• Large grid size and small objects
+Solution: use an anchor box
+The objects are assigned to the anchor boxes based on the
+similarity of the bounding box and the anchor box shape
+(IoU)
+• Each anchor box will be associated with
+• Object (bx,by, W,H)
+• Object class type
+• Confidence probability that there exists an object
+• Overlapped objects
+Person will assigned anchor box-1 ,car
+will assigned anchor box 2
+• Small object relative to gride size
+• Object-1 will assigned anchor box-1
+,object-2 will assigned anchor box 2
+ANCHOR BOXES FOR MULTIPLE
+OBJECT DETECTION
+MULTIPLE ANCHORS (MULTIPLE OBJECT/CELL)
+Output vector Y: SxSx number of anchors x(5+number of classes)
+Y: 3x3x2x(5+3)
+MULTIPLE ANCHORS (ONE OBJECT/CELL)
+• For SxS cells ,M anchor, N classes
+• One object cell
+• Total size= SxS*(M*5+N)
+• Multiple objects per cell
+• Total size= SXS*M*[5+N]
+• Example (s=13,M=6 anchors, N=100 class)
+• On object per cell : total size= 13*13*[6*5+100]=21970
+• Multiple object per cell : total size= 13*13*6[5+100]=106470
+WHAT IF THE OBJECT IS ASSIGNED TO THE
+WRONG ANCHOR BOX?
+WHAT IF THE OBJECT IS ASSIGNED TO THE
+WRONG ANCHOR BOX?
+BEST SIZES OF ANCHORS
+Number of clusters= 4,FV=[W,H], Distance measure “1-IoU”
+BEST SIZES OF ANCHORS (FROM LABELED DATASET)
+Select average or median of each cluster
+Cluster-1 Cluster-2 Cluster-3 Cluster-4
+1 2 3 4
+ASSIGN ANCHORS TO EACH OBJECT
+1
+2
+3
+4
+Calculate IoU1
+Calculate IoU2
+Calculate IoU3
+Calculate IoU4
+Select the anchor with the highest IoU
+BEST NUMBER OF ANCHOR BOXES
+YOLO VERSIONS
+YOLO OUTPUT
+
+Page
+1
+of 19
+COMPUTER VISION COURSE
+LEC. 9
+YOLO [YOU ONLY LOOK ONCE]
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+RECALL
+YOLO OUTPUT
+LOSS FUNCTION
+• Loss=[Loclization loss, object loss, classification loss]
+• Loss of one cell, one anchor box
+• 𝑙𝑜𝑐𝑙𝑖𝑧𝑎𝑡𝑖𝑜𝑛 𝑙𝑜𝑠𝑠 = ൝(𝑥 − ො𝑥)2+(𝑦 − ො𝑦)2+( 𝑤 − ෢𝑤)2+( ℎ − ෢ℎ)2 𝑖𝑓 𝑡ℎ𝑒𝑟𝑒 𝑖𝑠 𝑎𝑛 𝑜𝑏𝑗𝑒𝑐𝑡
+𝑧𝑒𝑟𝑜 𝑖𝑓 𝑛𝑜 𝑜𝑏𝑗𝑒𝑐𝑡
+• 𝑂𝑏𝑗𝑒𝑐𝑡𝑛𝑒𝑠𝑠 𝑙𝑜𝑠𝑠 = ൝(𝐶 − መ𝐶)2 𝑖𝑓 𝑡ℎ𝑒𝑟𝑒 𝑖𝑠 𝑎𝑛 𝑜𝑏𝑗𝑒𝑐𝑡
+(𝐶 − መ𝐶)2 𝑖𝑓 𝑛𝑜 𝑜𝑏𝑗𝑒𝑐𝑡
+Classification 𝑙𝑜𝑠𝑠 = ൝σ𝑐 ∈𝑎𝑙𝑙 𝑐𝑙𝑎𝑠𝑠𝑒𝑠(𝑃 𝑐 − ො𝑝(𝑐)) 2 𝑖𝑓 𝑡ℎ𝑒𝑟𝑒 𝑖𝑠 𝑎𝑛 𝑜𝑏𝑗𝑒𝑐𝑡
+𝑧𝑒𝑟𝑜 𝑖𝑓 𝑛𝑜 𝑜𝑏𝑗𝑒𝑐𝑡
+Lobj[ 𝑥 − ො𝑥 2 + 𝑦 − ො𝑦 2 + 𝑤 − ෢𝑤 2
++ ℎ − ෢ℎ 2
+]+
+Loss of one cell = (𝐶 − መ𝐶)2 +
+Lobj σ𝑐 𝑎𝑙𝑙 𝑐𝑙𝑎𝑠𝑠𝑒𝑠(𝑃 𝑐 − Ƹ 𝑝(𝑐)) 2
+LOSS FUNCTION WITH NO WEIGHT
+•Instead of predicting the width and height directly, Yolo predicts the square roots to account for deviations
+in small numbers being more significant than the same deviation in big numbers.
+•The square root mapping is used to expand smaller numbers, e.g. any number in [0,0.25] gets mapped to
+[0,0.5].
+LOSS FUNCTION FOR YOLO V-1
+• Most of the grids usually have no objects. This part of the equation will get lot of attention
+let λNoObject has a very small value (e.g. 0.5) in that the model will NOT be biased about No Object.
+• let λcoordinate has a higher value than λNoObject (5.0 vs 0.5)
+to force the model to focus more on predicting the correct object coordinates (bounding boxes)
+• λcoordinate : weight for localization loss
+• λObject: weight for objectness loss (if no object)
+λcoordinate [Lobj(𝑥 − ො𝑥)2+(𝑦 − ො𝑦)2+( 𝑤 − ෢𝑤)2+( ℎ − ෢ℎ)2] +
+Lobj[ 𝐶 − መ𝐶 2] +
+Loss of one cell = λNoObj[LNoObj[ 𝐶 − መ𝐶 2]] +
+Lobj [ σ𝑐 𝑎𝑙𝑙 𝑐𝑙𝑎𝑠𝑠𝑒𝑠(𝑃 𝑐 − Ƹ 𝑝(𝑐)) 2]
+LOSS FUNCTION FOR YOLO V-1
+ALL CELLS/ONE ANCHOR
+σ𝑖=1
+𝑠2
+λcoordinate [Lobj(𝑥 − ො𝑥)2+(𝑦 − ො𝑦)2+( 𝑤 − ෢𝑤)2+( ℎ − ෢ℎ)2] +
+σ𝑖=1
+𝑠2
+Lobj[ 𝐶 − መ𝐶 2] +
+Loss of all cells = σ𝑖=1
+𝑠2
+λNoObj[LNoObj[ 𝐶 − መ𝐶 2]] +
+σ𝑖=1
+𝑠2
+Lobj [ σ𝑐 𝑎𝑙𝑙 𝑐𝑙𝑎𝑠𝑠𝑒𝑠(𝑃 𝑐 − Ƹ 𝑝(𝑐)) 2 ]
+LOSS FUNCTION FOR YOLO V-1
+LOSS FUNCTION FOR YOLO V-2,V-3
+LOSS FUNCTION FOR YOLO V-2,V-3
+LOSS FUNCTION USING IOU
+❑ Localization Loss may take any value
+Objectness Loss is less than 1
+Classification Loss is less than 1
+❑ Localization Loss will dominate even with a weighting factor
+❑ Solution: use UoI as a measure of similarity between Bounding Box and the ground truth
+bounding box (Loss=1-IoU)
+INTERSECTION OVER UNION (IOU)
+IOU EQUATIONS
+LOSS FUNCTION USING IOU
+CIOU BASED REGRESSION LOSS
+
+Page
+1
+of 21
+COMPUTER VISION COURSE
+LEC. 10
+RCNN-FAST RCNN-FASTER RCNN
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+RECALL (SLIDING WINDOW ALGORITHM)
+MAIN DISADVANTAGE OF THE SLIDING WINDOW
+• Main Disadvantage: Very Slow
+• Reasons for Very Slow Performance:
+• Number of picked windows is very huge
+• For CNN classifier, it needs to apply convolution to each window content
+R-CNN (REGION-BASED CONVOLUTIONAL NEURAL
+NETWORK)
+❑ R-CNN (Region-based Convolutional Neural Network) was introduced in 2014. R-CNN revolutionized object
+detection by combining the strengths of region proposal algorithms and deep learning, leading to remarkable
+improvements in detection accuracy and efficiency.
+❑ This approach utilizes a selective search algorithm to generate approximately 2,000 region proposals, which are then
+processed through a Convolutional Neural Network (CNN) to extract features.
+❑ Main features of RCNN
+1. Detect each object
+2. Classify what each object is, and
+3. Draw a bounding box around each object.
+4. Fast model compared to sliding window algorithm as it select only set of regions not all regions
+R-CNN
+REGION PROPOSALS
+• There are many techniques for Region Proposals
+Most common techniques:
+1. Selective Search
+(similarity of pixel colors, intensity, texture, ...)
+2. Edge Boxes
+• Each region is extracted from the image, then passed through CNN to calculate the feature
+map.
+• All regions are clipped to have the same size (in order to have the same feature map size) to
+be passed to fully connected (FC) layers for classification and regression of bounding boxes.
+RCNN
+HOW R-CNN WORK
+R-CNN follows a two-stage approach:
+1. Region Proposal (Where are the objects?)
+• It first proposes around 2000 regions in the image that might contain objects.
+• These are called Region Proposals and are generated using a method like Selective Search.
+2. Classification + Bounding Box Regression
+• For each region:
+• Crop and resize it to a fixed size (e.g., 224x224).
+• Feed it into a CNN (like AlexNet) to extract features.
+• Use those features to:
+• Classify what object (if any) is in that region.
+• Refine the bounding box to better fit the object using regression.
+REGION PROPOSALS
+❑ R-CNNs begin by generating region proposals, which are smaller sections of the
+image that may contain the objects we are searching for.
+❑ The algorithm employs a method called selective search, a greedy approach that
+generates approximately 2,000 region proposals per image. Selective search
+effectively balances the number of proposals while maintaining high object recall,
+ensuring efficient object detection.
+❑ By limiting the number of regions for detailed analysis, this method enhances the
+overall performance of the R-CNN in detecting objects within images.
+❑ A significant drawback of R-CNN is that it is computationally expensive, requiring the CNN
+to be run on each ROI individually.
+Selective
+Search
+1. Selective Search starts by over-
+segmenting the image using a
+graph-based segmentation
+method given by Felzenszwalb
+and Huttenlocher
+2. Recursively combine the smaller
+similar regions into larger ones.
+We use Greedy algorithm to
+combine similar regions to make
+larger regions.
+3. Use the segmented region
+proposals to generate candidate
+object locations
+Selective Search uses 4 similarity measures based on color, texture, size, and
+shape compatibility and uses these measures to merge regions with high
+similarity and creates bounding boxes each time.
+LIMITATIONS OF RCNN
+• Cropping of proposed regions is very slow
+• Requires applying convolution on each proposed image (Multiple
+Convolutions)
+• The same object will be detected in multiple windows (with different
+bounding boxes) due to non-optimized proposed regions
+• Solution (to reason #2):
+Save time by performing CNN only once on the whole input image
+EVOLUTION OF R-CNN
+R-CNN was the starting point for a series of improvements in object detection
+algorithms, leading to more advanced models like Fast R-CNN, Faster R-CNN, and
+Mask R-CNN:
+Fast R-CNN: Improves upon R-CNN by processing the entire image with a CNN
+first, and then using region proposals to extract features from the shared feature
+map, reducing redundant computations.
+Faster R-CNN: Introduces the Region Proposal Network (RPN) that shares
+convolutional layers with the detection network, making the region proposal
+generation faster and more efficient.
+FAST RCNN ALGORITHM
+1. The whole image is passed through CNN to get feature map of the whole image
+2. Each region is extracted from feature map (not from the original image). In other words,
+Project the bounding box on the Feature map of the image.
+3. Since regions are of different sizes, their corresponding feature map will be of different
+sizes. Can’t be fed to FC NN directly (required to be of same size)
+4. Instead of cropping regions in RCNN; Apply ROI pool layer to fix length of Feature maps
+of all different-size regions.
+5. Fixed length Feature Maps are passed to FC NN for classification and regression of
+Bounding Boxes.
+FAST RCNN
+FAST RCNN
+LIMITATION OF F-RCNN
+1. Slow (due to using selective search technique for region proposal)
+2. Still large number of Proposed regions
+3. Same object will be detected in multiple windows (with different Bounding Boxes-> can be solved
+using NMS)
+Solution
+Automate Region Proposal using Trained Network (RPN) (instead of handcrafted techniques such as
+Selective Search )
+FASTER RCNN
+•Region Proposals through the trained "Region Proposal Network RPN)“
+•The whole image is passed through CNN to get feature map of the whole image
+•Each region is extracted from feature map (not from the original image). In other words,
+Project the bounding box on the Feature map of the image.
+•Since regions are of different sizes, their corresponding feature map will be of different
+sizes. Can't be feed to FC NN directly (required to be of same size)
+•Instead of cropping regions in RCNN; Apply ROI pool layer to fix length of Feature maps of
+all different-size regions.
+•fixed length Feature Maps are passed to FC NN for classification and regression of
+Bounding Boxes.
+FASTER R-CNN
+• Faster R-CNN replaces selective search with a Deep Learning based Region proposal Network (RPN). This way, everything
+is trained end to end using a unified network.
+The full process goes like this:
+1. Extract the Features using a CNN
+2. Generate Region Proposals using a Region Proposal Network.
+3. Use ROI Pooling to avoid cropping/warping regions
+4. Send this to FC layers and classify using a neural network
+FASTER R-CNN
+
+Page
+1
+of 41
+COMPUTER VISION COURSE
+LEC. 11
+REGION PROPOSED NETWORK (RPF)
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+RCNN
+FAST-RCNN
+FASTER-RCNN
+REGION PROPOSAL NETWORK (RPN)
+• RPN is a fully convolutional network that
+predicts the object bounds by learning from
+feature maps extracted from a base network.
+It has a classifier that returns the probability of
+the region and a regressor that returns the
+coordinates of bounding boxes.
+• It acting as the core component of the Faster R-
+CNN architecture, significantly reducing
+detection time compared to earlier methods.
+How it Works (The Mechanics)
+The RPN operates on a "Feature Map" (a condensed, numerical version of your image created
+by a backbone like VGG or ResNet).
+1.Sliding Window: It slides a small spatial window(region) over the feature map.
+2.Anchor Boxes: At each position, it evaluates several "anchors"—predefined boxes of
+different scales (small, medium, large) and aspect ratios (tall, wide, square).
+3.Two-Head Output: For every single anchor box, the RPN calculates two things:
+•Objectness Score: A probability of whether the box contains an actual object versus just
+being background.
+•Boundary Refinement: Mathematical offsets (regressions) to tweak the box coordinates
+so they fit the object better.
+4.Proposal Generation: It keeps the boxes with the highest scores and passes them to the
+next stage of the network for final classification (e.g., "Is this a car or a person?").
+REGION PROPOSAL NETWORK (RPN)
+ANCHOR BOXES
+ANCHOR BOXES
+•Selected sizes of Anchor boxes are too small (with respect to objects)
+•Only Ball may be detected by anchor boxes
+•Other anchor boxes will be assumed as background (IOU with ground truth is small)
+ANCHOR BOXES
+If K=9, Anchor boxes per anchor point (3 scales *
+3 ratios)
+# of anchor points = 4 * 5 = 20
+Total Number of Anchor boxes (within
+Image)=20 * 9=180 boxes
+ANCHOR BOXES PARAMETERS
+• Each Anchor Box is characterized by
+two vectors:
+[1] Content Classification vector:
+• Enclose Object (object/ positive)
+• Part of the Background (BG/ negative)
+• Mix between part of object and part of
+background (MIX)
+• Classification of Anchor Boxes is based
+on IOU Between Anchor Box and
+Ground Truth Object Boxes in the image
+• Classification (or Objectness) Vector
+Length=2
+Classification of Anchor Boxes
+Classification of Anchor Boxes is based on IOU between the Anchor Box and the Ground Truth
+Object Boxes in the image
+Anchor Box is classified as Positive if:
+1.Has the Highest IOU with one of the ground truth boxes (one of the objects)
+2.Has IOU>0.7 with any of the ground truth boxes (even if not the Highest)
+Anchor Box is classified as Negative if:
+1.Has IOU < 0.3 with ALL ground truth boxes (all objects)
+Anchor Box is classified as Mix (Undetermined) if:
+1.Neither Positive Nor Negative
+Classification of Anchor Boxes
+[2] Bounding Box offsets vector [ w.r.t Ground truth box of its enclosed
+object] (for Anchor boxes classified as containing objects ONLY)
+• Displacement between both centers
+• Ratio between Width and height of Anchor Box and Ground Truth Box
+• These are the "offsets" used to stretch, shrink, or shift the anchor box so it perfectly aligns
+with the real object.
+• Regressor Vector Length = 4
+ANCHOR BOXES PARAMETERS
+REGRESSOR VECTOR OF ANCHOR BOX
+REGRESSOR VECTOR OF ANCHOR BOX
+RPN DATA TRAINING PREPARATION
+1. Get a training dataset that contain images
+with Annotated objects (bounding boxes)
+2. Use any pre-trained CNN as Backbone
+(e.g. VGG16, ResNet or ResNext) to obtain
+the feature map of the input image
+3. For each anchor point in the input image,
+generate coordinates for all "K" anchor
+boxes (centered at this anchor point)
+4. Calculate IOU between those anchor boxes
+and ALL objects ground truth boxes.
+5. Mark each anchor box as enclosing
+Object [1 , 0], Background only [0 , 1], or
+Mix [0 , 0].
+6. This "Objectness" vector length should be
+*"K"2
+7. For anchor boxes including objects ONLY, calculate the
+displacement vector (4 values) between the anchor
+box and corresponding object box. This "Regressor"
+vector length should be *"K"4.
+8. For other anchor boxes (Mix or Background), fill the
+values with zeros. (will not be used). This "Regressor"
+vector length should be *"K"4.
+9. Provide RPN with both feature map (as Input) and
+"Objectness & Regressor" vectors (for each anchor
+point) as Label.
+RPN DATA TRAINING PREPARATION
+VGG-16 AS BACKBONE FOR RPN
+RECALL :VGG-16
+RPN WITH VGG-16
+1X1 CONVOLUTION
+1X1 CONVOLUTION
+APPLY 1X1 CONVOLUTION FILTER(S) (ON THE
+FEATURE MAP OF LAST VGG CONV LAYER)
+APPLY 1X1 CONVOLUTION FILTER(S) (ON THE
+FEATURE MAP OF LAST VGG CONV LAYER)
+RPN ARCHITECTURE
+RPN LOSS FUNCTION
+[1] OBJECT CLASSIFICATION LOSS (OBJECT /
+BACKGROUND)
+[2] BOX REGRESSOR LOSS
+L SMOOTH FUNCTION
+The Smooth L_1 loss for bounding box
+regression combines the best of both worlds:
+1.Near Zero: It behaves like L_2 loss
+(quadratic), which makes it smooth and easy
+for the model to converge when the
+prediction is almost perfect.
+2.Far from Zero: It behaves like L_1 loss
+(linear), which prevents "gradient explosion"
+if an outlier box is way off-target.
+Smoothing Function (L_1)
+TOTAL LOSS
+This structured approach allows the network to
+simultaneously learn where an object might
+be and how to refine the box shape to fit
+that object perfectly
+LOSS CALCULATION ON MINI-BATCH
+OBTAIN REGION PROPOSAL FOR ALL
+ANCHORS(INFERENCE STEP)
+FILTER RPN REGION PROPOSAL (NMS)
+FULL RPN ALGORITHM: PHASE-1
+Phase 1: Feature Extraction & Setup
+1.Backbone Pass: Input an image into a pre-trained CNN (e.g., VGG16 or ResNet). Extract
+the feature map from the final convolutional layer.
+2.Grid Definition: Divide the input image into a grid of cells (e.g., 7 \times 7 or 14 \times
+14) based on the feature map's spatial dimensions.
+3.Anchor Initialization: At the center of every grid cell (the Anchor Point), generate $K$
+Anchor Boxes of predefined scales and aspect ratios (standard is K=9: 3 scales 3, ratios).
+Phase 2: Training Data Preparation (Ground Truth)
+For each of the N total anchor boxes generated across the image:
+1.IOU Calculation: Calculate the Intersection over Union (IOU) between the
+anchor box and all annotated Ground Truth (GT) object boxes.
+2.Label Assignment (Objectness):
+•Positive (1): Assign to any anchor with the highest IOU for a GT box, or any
+anchor with IOU>0.7.
+•Negative (0): Assign to anchors with IOU < 0.3 for all GT boxes.
+•MIX (): Anchors with 0.3 < IOU < 0.7
+3. Target Regression Calculation: For Positive anchors ONLY, calculate the
+displacement vector d_L = (d_x, d_y, d_w, d_h) relative to the GT box:
+FULL RPN ALGORITHM:PHASE-2
+Phase 3: The Prediction Heads
+Apply two parallel 1 x1 convolutional layers to the feature map:
+1.Classification Head: Outputs a vector of length 2K per anchor point (probabilities for
+Object vs. Background).
+2.Regression Head: Outputs a vector of length 4K per anchor point (predicted offsets dP).
+FULL RPN ALGORITHM:PHASE-3
+Phase 4: Optimization (Multi-Task Loss)
+Train the network by minimizing the total loss function:
+FULL RPN ALGORITHM:PHASE-4
+Phase 5: Proposal Generation (Inference)
+1.Apply Offsets: Use the predicted offsets dP to transform the anchor boxes into refined Region
+Proposals.
+2.Filtering: Sort proposals by their objectness scores.
+3.NMS (Non-Maximum Suppression): Remove highly overlapping boxes (high IOU with each other) to
+keep only the best proposal for each potential object.
+4.Output: Pass the top N proposals (e.g., 300 or 2000) to the next stage (ROI Pooling/Classification).
+FULL RPN ALGORITHM:PHASE-5
+FASTER RCNN AND RPN
+
+Page
+1
+of 26
+COMPUTER VISION COURSE
+LEC. 12
+ROI POOLING FOR FAST/FASTER
+RCNN
+DR.MONA M.SOLIMA
+mona.soliman@eui.edu.eg
+FASTER-RCNN
+RECALL: POOLING
+EFFECT OF SHIFT AND POOLING ON FEATURE MAP
+QUANTIZATION IS THE SOURCE OF ERROR ?
+ROI POOLING: PROBLEM DEFINITION
+When this box is mapped from the original image to the
+smaller feature map:
+• the image is reduced after convolution and pooling.
+• exact coordinates become fractional values (decimal
+values)
+Example:
+𝑥 = 52.7, 𝑦 = 103.4
+But feature maps work on discrete grid cells, so ROI
+Pooling must round them to integers:
+52.7 → 53
+103.4 → 103
+This mismatch causes:
+• inaccurate feature extraction
+• lower detection accuracy
+• localization error
+This is called: Quantization Error
+ANNOTATED IMAGE
+FEATURE MAP
+TRADITIONAL ROI POOLING (2X1)
+TRADITIONAL ROI POOLING (2X2)
+LINEAR INTERPOLATION
+BI-LINEAR INTERPOLATION (INTERPOLATION IN Y-
+AXIS)
+ALIGN ROI POOLING
+• Apply max pooling on the calculated
+samples
+• Repeat for all cells for ROI
+ARCHITECTURE OF DETECTOR NETWORK (FAST
+RCNN, FASTER RCNN)
+• After ROI Pooling, the fixed-
+size feature map is flattened
+and passed through fully
+connected layers. The network
+then splits into two branches: a
+softmax classifier for object
+class prediction and a
+bounding box regressor for
+refining object location using
+four coordinates for each
+class.
