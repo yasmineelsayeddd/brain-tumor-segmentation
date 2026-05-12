@@ -43,7 +43,6 @@ import argparse
 import json
 from pathlib import Path
 
-import nibabel as nib
 import numpy as np
 from tqdm import tqdm
 
@@ -52,6 +51,11 @@ MODALITIES = ["flair", "t1", "t1ce", "t2"]
 
 def load_modality(patient_dir: Path, patient_id: str, modality: str) -> np.ndarray:
     """Load a single 3D modality volume."""
+    try:
+        import nibabel as nib
+    except ImportError as exc:
+        raise ImportError("nibabel is required for BraTS NIfTI loading. Install requirements.txt first.") from exc
+
     path = patient_dir / f"{patient_id}_{modality}.nii"
     if not path.exists():
         path = patient_dir / f"{patient_id}_{modality}.nii.gz"

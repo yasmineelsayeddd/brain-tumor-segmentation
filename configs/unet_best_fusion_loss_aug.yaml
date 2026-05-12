@@ -1,5 +1,5 @@
 experiment:
-  name: unet_baseline
+  name: unet_best_fusion_loss_aug
   seed: 42
   output_dir: outputs/
 
@@ -25,13 +25,13 @@ checkpoint_dir: checkpoints/
 training:
   epochs: 100
   optimizer: adam
-  lr: 1.0e-3
+  lr: 8.0e-4
   weight_decay: 1.0e-5
   scheduler: cosine
   loss: dice_ce
   augment: true
-  dice_weight: 0.5
-  ce_weight: 0.5
+  dice_weight: 0.7
+  ce_weight: 0.3
   early_stopping_patience: 15
 
 evaluation:

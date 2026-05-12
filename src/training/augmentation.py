@@ -1,17 +1,26 @@
-"""Albumentations-based augmentation pipeline for BraTS 2D slices.
-
-All transforms are spatial (applied identically to image and mask) or
-intensity-only (applied to image channels only).
-"""
+"""Augmentation pipeline for BraTS 2D slices."""
 
 from __future__ import annotations
 
-import albumentations as A
+from typing import Any
+
 import numpy as np
 
+try:
+    import albumentations as A
+except ImportError:  # Keep imports/test discovery usable before Kaggle deps install.
+    A = None
 
-def get_train_transforms(image_size: int = 240) -> A.Compose:
-    """Standard augmentation pipeline for training."""
+
+def get_train_transforms(image_size: int = 240) -> Any:
+    """Standard augmentation pipeline for training.
+
+    Albumentations is optional at import time so local smoke tests can run before
+    installing the full Kaggle stack. Training with augmentations still requires
+    the package.
+    """
+    if A is None:
+        raise ImportError("albumentations is required for training augmentations. Install requirements.txt first.")
     return A.Compose(
         [
             A.HorizontalFlip(p=0.5),
@@ -25,7 +34,6 @@ def get_train_transforms(image_size: int = 240) -> A.Compose:
                 p=0.5,
             ),
             A.ElasticTransform(alpha=1, sigma=50, p=0.2),
-            # Intensity augmentations on image channels only
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.4),
             A.GaussNoise(std_limit=(0.01, 0.05), p=0.3),
             A.GaussianBlur(blur_limit=(3, 5), p=0.2),
@@ -34,28 +42,19 @@ def get_train_transforms(image_size: int = 240) -> A.Compose:
 
 
 def get_val_transforms(image_size: int = 240) -> None:
-    """No augmentation at validation — return None to signal pass-through."""
+    """No augmentation at validation."""
     return None
 
 
 class AlbumentationsWrapper:
-    """Wraps an albumentations Compose to be compatible with BraTSDataset transform.
+    """Wrap an albumentations Compose for (C,H,W) image and (H,W) mask arrays."""
 
-    BraTSDataset passes (image: np.ndarray (4,H,W), mask: np.ndarray (H,W))
-    to transform. Albumentations expects HWC image and HW mask.
-    """
-
-    def __init__(self, transforms: A.Compose | None) -> None:
+    def __init__(self, transforms: Any | None) -> None:
         self.transforms = transforms
 
-    def __call__(
-        self, image: np.ndarray, mask: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def __call__(self, image: np.ndarray, mask: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.transforms is None:
             return image, mask
-
-        # (4,H,W) → (H,W,4) for albumentations
         img_hwc = image.transpose(1, 2, 0)
         result = self.transforms(image=img_hwc, mask=mask)
-        # Back to (4,H,W)
         return result["image"].transpose(2, 0, 1), result["mask"]

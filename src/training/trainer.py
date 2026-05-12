@@ -12,24 +12,15 @@ from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
 
-from src.evaluation.metrics import dice_per_class, mean_dice, pixel_accuracy
+from src.evaluation.metrics import mean_dice, pixel_accuracy
+from src.utils.artifacts import experiment_dir, save_json, save_rows_csv, save_yaml
 from src.utils.logging import setup_logger
 
 logger = setup_logger("trainer")
 
 
 class Trainer:
-    """Generic segmentation trainer.
-
-    Args:
-        model:        PyTorch model.
-        criterion:    Loss function (logits, targets) → scalar.
-        optimizer:    Torch optimizer.
-        scheduler:    Optional LR scheduler (step called after each epoch).
-        device:       "cuda" | "cpu" | "mps".
-        num_classes:  Number of output classes.
-        checkpoint_dir: Directory to save best model weights.
-    """
+    """Generic segmentation trainer with standardized artifacts."""
 
     def __init__(
         self,
@@ -40,6 +31,11 @@ class Trainer:
         device: str = "cuda",
         num_classes: int = 4,
         checkpoint_dir: str | Path = "checkpoints",
+        output_dir: str | Path = "outputs",
+        experiment_name: str = "model",
+        config: dict[str, Any] | None = None,
+        early_stopping_patience: int | None = None,
+        tensorboard: bool = False,
     ) -> None:
         self.model = model.to(device)
         self.criterion = criterion
@@ -49,103 +45,125 @@ class Trainer:
         self.num_classes = num_classes
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
-
+        self.experiment_name = experiment_name
+        self.output_dir = experiment_dir(output_dir, experiment_name)
+        self.early_stopping_patience = early_stopping_patience
         self.best_val_dice = -1.0
         self.history: list[dict[str, Any]] = []
+        self.writer = None
 
-    # ------------------------------------------------------------------
+        if config is not None:
+            save_yaml(config, self.output_dir / "config.yaml")
+        if tensorboard:
+            try:
+                from torch.utils.tensorboard import SummaryWriter
+
+                self.writer = SummaryWriter(log_dir=str(self.output_dir / "tensorboard"))
+            except ImportError:
+                logger.warning("TensorBoard requested but unavailable; continuing without it.")
+
     def _run_epoch(self, loader: DataLoader, train: bool) -> dict[str, float]:
         self.model.train(train)
         total_loss = 0.0
         total_dice = 0.0
-        total_acc  = 0.0
-        n_batches  = 0
-
+        total_acc = 0.0
+        n_batches = 0
         ctx = torch.enable_grad() if train else torch.no_grad()
+
         with ctx:
             for images, masks in loader:
                 images = images.to(self.device, non_blocking=True)
-                masks  = masks.to(self.device, non_blocking=True)
-
+                masks = masks.to(self.device, non_blocking=True)
                 logits = self.model(images)
-                loss   = self.criterion(logits, masks)
+                loss = self.criterion(logits, masks)
 
                 if train:
-                    self.optimizer.zero_grad()
+                    self.optimizer.zero_grad(set_to_none=True)
                     loss.backward()
                     self.optimizer.step()
 
                 preds = logits.argmax(dim=1)
-                dice  = mean_dice(preds.cpu(), masks.cpu(), self.num_classes)
-                acc   = pixel_accuracy(preds.cpu(), masks.cpu())
-
                 total_loss += loss.item()
-                total_dice += dice
-                total_acc  += acc
-                n_batches  += 1
+                total_dice += mean_dice(preds.cpu(), masks.cpu(), self.num_classes)
+                total_acc += pixel_accuracy(preds.cpu(), masks.cpu())
+                n_batches += 1
 
-        return {
-            "loss": total_loss / n_batches,
-            "dice": total_dice / n_batches,
-            "acc":  total_acc  / n_batches,
-        }
+        if n_batches == 0:
+            raise ValueError("DataLoader produced zero batches")
+        return {"loss": total_loss / n_batches, "dice": total_dice / n_batches, "acc": total_acc / n_batches}
 
-    # ------------------------------------------------------------------
+    def _save_checkpoint(self, epoch: int) -> Path:
+        ckpt_path = self.checkpoint_dir / f"{self.experiment_name}_best.pth"
+        torch.save(
+            {
+                "epoch": epoch,
+                "model_state_dict": self.model.state_dict(),
+                "optimizer_state_dict": self.optimizer.state_dict(),
+                "val_dice": self.best_val_dice,
+                "experiment_name": self.experiment_name,
+            },
+            ckpt_path,
+        )
+        save_json({"best_checkpoint": str(ckpt_path), "best_val_dice": self.best_val_dice}, self.output_dir / "best.json")
+        return ckpt_path
+
     def fit(
         self,
         train_loader: DataLoader,
         val_loader: DataLoader,
         epochs: int,
-        experiment_name: str = "model",
+        experiment_name: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Run the full training loop.
+        """Run the full training loop and save history artifacts."""
+        if experiment_name is not None and experiment_name != self.experiment_name:
+            self.experiment_name = experiment_name
 
-        Returns:
-            Training history (list of per-epoch metric dicts).
-        """
+        epochs_without_improvement = 0
         for epoch in range(1, epochs + 1):
             t0 = time.time()
             train_metrics = self._run_epoch(train_loader, train=True)
-            val_metrics   = self._run_epoch(val_loader,   train=False)
-
+            val_metrics = self._run_epoch(val_loader, train=False)
             if self.scheduler is not None:
                 self.scheduler.step()
 
-            elapsed = time.time() - t0
             record = {
                 "epoch": epoch,
                 "train_loss": train_metrics["loss"],
                 "train_dice": train_metrics["dice"],
-                "train_acc":  train_metrics["acc"],
-                "val_loss":   val_metrics["loss"],
-                "val_dice":   val_metrics["dice"],
-                "val_acc":    val_metrics["acc"],
-                "lr":         self.optimizer.param_groups[0]["lr"],
-                "elapsed_s":  elapsed,
+                "train_acc": train_metrics["acc"],
+                "val_loss": val_metrics["loss"],
+                "val_dice": val_metrics["dice"],
+                "val_acc": val_metrics["acc"],
+                "lr": self.optimizer.param_groups[0]["lr"],
+                "elapsed_s": time.time() - t0,
             }
             self.history.append(record)
 
+            if self.writer is not None:
+                for key, value in record.items():
+                    if key != "epoch":
+                        self.writer.add_scalar(key, value, epoch)
+
             logger.info(
-                f"Epoch {epoch:03d}/{epochs}  "
-                f"train_loss={train_metrics['loss']:.4f}  "
-                f"val_dice={val_metrics['dice']:.4f}  "
-                f"lr={record['lr']:.2e}  "
-                f"({elapsed:.0f}s)"
+                f"Epoch {epoch:03d}/{epochs} train_loss={record['train_loss']:.4f} "
+                f"val_dice={record['val_dice']:.4f} lr={record['lr']:.2e} ({record['elapsed_s']:.0f}s)"
             )
 
-            # Save best checkpoint
             if val_metrics["dice"] > self.best_val_dice:
                 self.best_val_dice = val_metrics["dice"]
-                ckpt_path = self.checkpoint_dir / f"{experiment_name}_best.pth"
-                torch.save(
-                    {
-                        "epoch": epoch,
-                        "model_state_dict": self.model.state_dict(),
-                        "optimizer_state_dict": self.optimizer.state_dict(),
-                        "val_dice": self.best_val_dice,
-                    },
-                    ckpt_path,
-                )
-                logger.info(f"  ✓ New best val_dice={self.best_val_dice:.4f} — saved to {ckpt_path}")
+                epochs_without_improvement = 0
+                ckpt_path = self._save_checkpoint(epoch)
+                logger.info(f"New best val_dice={self.best_val_dice:.4f}; saved to {ckpt_path}")
+            else:
+                epochs_without_improvement += 1
 
+            save_rows_csv(self.history, self.output_dir / "history.csv")
+            save_json(self.history, self.output_dir / "history.json")
+
+            if self.early_stopping_patience is not None and epochs_without_improvement >= self.early_stopping_patience:
+                logger.info(f"Early stopping after {epochs_without_improvement} epochs without improvement.")
+                break
+
+        if self.writer is not None:
+            self.writer.close()
         return self.history
