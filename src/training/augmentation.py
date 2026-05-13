@@ -55,6 +55,8 @@ class AlbumentationsWrapper:
     def __call__(self, image: np.ndarray, mask: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.transforms is None:
             return image, mask
-        img_hwc = image.transpose(1, 2, 0)
+        # cv2-backed transforms (GaussianBlur, ElasticTransform, ShiftScaleRotate, …)
+        # require float32. Cast here; BraTSDataset converts back to tensor.float() anyway.
+        img_hwc = image.transpose(1, 2, 0).astype(np.float32)
         result = self.transforms(image=img_hwc, mask=mask)
         return result["image"].transpose(2, 0, 1), result["mask"]
