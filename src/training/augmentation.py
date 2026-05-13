@@ -18,6 +18,10 @@ def get_train_transforms(image_size: int = 240) -> Any:
     Albumentations is optional at import time so local smoke tests can run before
     installing the full Kaggle stack. Training with augmentations still requires
     the package.
+
+    Note: ShiftScaleRotate and ElasticTransform are excluded because they call
+    cv2.warpAffine/remap, which fails with 4-channel float32 images in OpenCV 4.x.
+    Flips + RandomRotate90 provide sufficient spatial augmentation for brain MRI.
     """
     if A is None:
         raise ImportError("albumentations is required for training augmentations. Install requirements.txt first.")
@@ -26,16 +30,8 @@ def get_train_transforms(image_size: int = 240) -> Any:
             A.HorizontalFlip(p=0.5),
             A.VerticalFlip(p=0.2),
             A.RandomRotate90(p=0.3),
-            A.ShiftScaleRotate(
-                shift_limit=0.05,
-                scale_limit=0.1,
-                rotate_limit=15,
-                border_mode=0,
-                p=0.5,
-            ),
-            A.ElasticTransform(alpha=1, sigma=50, p=0.2),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.4),
-            A.GaussNoise(std_limit=(0.01, 0.05), p=0.3),
+            A.GaussNoise(p=0.3),
             A.GaussianBlur(blur_limit=(3, 5), p=0.2),
         ],
     )
