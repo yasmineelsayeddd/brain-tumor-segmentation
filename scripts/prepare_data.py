@@ -85,6 +85,8 @@ def process_patient(
     patient_dir: Path,
     output_dir: Path,
     keep_empty_ratio: float = 0.0,
+    image_dtype: str = "float32",
+    min_tumor_pixels: int = 1,
 ) -> list[tuple[str, int]]:
     """Extract 2D slices from one patient.
 
@@ -92,6 +94,8 @@ def process_patient(
         patient_dir: Directory containing one patient's .nii files.
         output_dir: Where to write the per-slice .npy files.
         keep_empty_ratio: Fraction of tumor-free slices to keep (0 = drop all).
+        image_dtype: dtype used for saved image slices. Use float16 on Kaggle to reduce disk.
+        min_tumor_pixels: Minimum tumor pixels needed to keep a tumor slice.
 
     Returns:
         List of (patient_id, slice_index) pairs that were saved.
@@ -113,7 +117,8 @@ def process_patient(
         image_slice = np.stack([v[..., idx] for v in volumes], axis=0)  # (4, H, W)
         mask_slice = seg[..., idx]
 
-        has_tumor = mask_slice.any()
+        tumor_pixels = int((mask_slice > 0).sum())
+        has_tumor = tumor_pixels >= min_tumor_pixels
         has_brain = (image_slice != 0).any(axis=0).any()
 
         if not has_brain:
@@ -121,7 +126,7 @@ def process_patient(
         if not has_tumor and np.random.random() > keep_empty_ratio:
             continue
 
-        np.save(out_subdir / f"slice_{idx:03d}_image.npy", image_slice.astype(np.float32))
+        np.save(out_subdir / f"slice_{idx:03d}_image.npy", image_slice.astype(image_dtype))
         np.save(out_subdir / f"slice_{idx:03d}_mask.npy", mask_slice.astype(np.uint8))
         saved.append((patient_id, idx))
 
@@ -139,6 +144,18 @@ def main() -> None:
         help="Fraction of tumor-free brain slices to keep (default 0).",
     )
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--image-dtype",
+        choices=["float16", "float32"],
+        default="float32",
+        help="Saved image dtype. float16 roughly halves prepared data size.",
+    )
+    parser.add_argument(
+        "--min-tumor-pixels",
+        type=int,
+        default=1,
+        help="Minimum non-background tumor pixels required to keep a tumor slice.",
+    )
     args = parser.parse_args()
 
     np.random.seed(args.seed)
@@ -151,7 +168,13 @@ def main() -> None:
     all_slices: list[tuple[str, int]] = []
     for patient_dir in tqdm(patient_dirs, desc="Patients"):
         try:
-            saved = process_patient(patient_dir, args.output, args.keep_empty_ratio)
+            saved = process_patient(
+                patient_dir,
+                args.output,
+                args.keep_empty_ratio,
+                image_dtype=args.image_dtype,
+                min_tumor_pixels=args.min_tumor_pixels,
+            )
             all_slices.extend(saved)
         except FileNotFoundError as e:
             print(f"Skipping {patient_dir.name}: {e}")
@@ -162,6 +185,8 @@ def main() -> None:
         "num_patients": len(patient_dirs),
         "num_slices": len(all_slices),
         "keep_empty_ratio": args.keep_empty_ratio,
+        "image_dtype": args.image_dtype,
+        "min_tumor_pixels": args.min_tumor_pixels,
         "slices": [{"patient": p, "slice": s} for p, s in all_slices],
     }
     with (args.output / "metadata.json").open("w") as f:
