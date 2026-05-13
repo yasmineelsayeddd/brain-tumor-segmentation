@@ -8,28 +8,20 @@ import numpy as np
 
 try:
     import albumentations as A
-except ImportError:  # Keep imports/test discovery usable before Kaggle deps install.
+except ImportError:
     A = None
 
 
 def get_train_transforms(image_size: int = 240) -> Any:
-    """Standard augmentation pipeline for training.
+    """Intensity-only augmentation via albumentations.
 
-    Albumentations is optional at import time so local smoke tests can run before
-    installing the full Kaggle stack. Training with augmentations still requires
-    the package.
-
-    Note: ShiftScaleRotate and ElasticTransform are excluded because they call
-    cv2.warpAffine/remap, which fails with 4-channel float32 images in OpenCV 4.x.
-    Flips + RandomRotate90 provide sufficient spatial augmentation for brain MRI.
+    Spatial transforms (flip, rotate) are applied directly in AlbumentationsWrapper
+    using numpy to avoid cv2.warpAffine failures with 4-channel float32 images.
     """
     if A is None:
-        raise ImportError("albumentations is required for training augmentations. Install requirements.txt first.")
+        raise ImportError("albumentations is required for training augmentations.")
     return A.Compose(
         [
-            A.HorizontalFlip(p=0.5),
-            A.VerticalFlip(p=0.2),
-            A.RandomRotate90(p=0.3),
             A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.4),
             A.GaussNoise(p=0.3),
             A.GaussianBlur(blur_limit=(3, 5), p=0.2),
@@ -38,12 +30,15 @@ def get_train_transforms(image_size: int = 240) -> Any:
 
 
 def get_val_transforms(image_size: int = 240) -> None:
-    """No augmentation at validation."""
     return None
 
 
 class AlbumentationsWrapper:
-    """Wrap an albumentations Compose for (C,H,W) image and (H,W) mask arrays."""
+    """Wrap transforms for (C,H,W) image and (H,W) mask arrays.
+
+    Spatial transforms run in numpy (works with any channel count).
+    Intensity transforms run through albumentations.
+    """
 
     def __init__(self, transforms: Any | None) -> None:
         self.transforms = transforms
@@ -51,8 +46,20 @@ class AlbumentationsWrapper:
     def __call__(self, image: np.ndarray, mask: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         if self.transforms is None:
             return image, mask
-        # cv2-backed transforms (GaussianBlur, ElasticTransform, ShiftScaleRotate, …)
-        # require float32. Cast here; BraTSDataset converts back to tensor.float() anyway.
+
+        # ── Spatial transforms (numpy — safe for 4-channel images) ──────────
+        if np.random.random() < 0.5:                          # horizontal flip
+            image = image[:, :, ::-1].copy()
+            mask  = mask[:, ::-1].copy()
+        if np.random.random() < 0.2:                          # vertical flip
+            image = image[:, ::-1, :].copy()
+            mask  = mask[::-1, :].copy()
+        if np.random.random() < 0.3:                          # 90° rotation
+            k = np.random.randint(1, 4)
+            image = np.rot90(image, k, axes=(1, 2)).copy()
+            mask  = np.rot90(mask,  k, axes=(0, 1)).copy()
+
+        # ── Intensity transforms (albumentations, no cv2 geometric ops) ─────
         img_hwc = image.transpose(1, 2, 0).astype(np.float32)
-        result = self.transforms(image=img_hwc, mask=mask)
+        result  = self.transforms(image=img_hwc, mask=mask)
         return result["image"].transpose(2, 0, 1), result["mask"]
