@@ -49,6 +49,7 @@ class Trainer:
         self.output_dir = experiment_dir(output_dir, experiment_name)
         self.early_stopping_patience = early_stopping_patience
         self.best_val_dice = -1.0
+        self.epochs_without_improvement = 0
         self.history: list[dict[str, Any]] = []
         self.writer = None
         # AMP scaler — no-op on CPU
@@ -129,18 +130,33 @@ class Trainer:
         save_json({"best_checkpoint": str(ckpt_path), "best_val_dice": self.best_val_dice}, self.output_dir / "best.json")
         return ckpt_path
 
+    def _save_last(self, epoch: int) -> None:
+        """Full training state, written every epoch so an interrupted run can resume cleanly."""
+        state = {
+            "epoch": epoch,
+            "model_state_dict": self.model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "best_val_dice": self.best_val_dice,
+            "epochs_without_improvement": self.epochs_without_improvement,
+            "history": self.history,
+            "experiment_name": self.experiment_name,
+        }
+        if self.scheduler is not None:
+            state["scheduler_state_dict"] = self.scheduler.state_dict()
+        torch.save(state, self.checkpoint_dir / f"{self.experiment_name}_last.pth")
+
     def fit(
         self,
         train_loader: DataLoader,
         val_loader: DataLoader,
         epochs: int,
         experiment_name: str | None = None,
+        start_epoch: int = 1,
     ) -> list[dict[str, Any]]:
         if experiment_name is not None and experiment_name != self.experiment_name:
             self.experiment_name = experiment_name
 
-        epochs_without_improvement = 0
-        for epoch in range(1, epochs + 1):
+        for epoch in range(start_epoch, epochs + 1):
             t0 = time.time()
             train_metrics = self._run_epoch(train_loader, train=True)
             val_metrics   = self._run_epoch(val_loader,   train=False)
@@ -172,17 +188,18 @@ class Trainer:
 
             if val_metrics["dice"] > self.best_val_dice:
                 self.best_val_dice = val_metrics["dice"]
-                epochs_without_improvement = 0
+                self.epochs_without_improvement = 0
                 ckpt_path = self._save_checkpoint(epoch)
                 logger.info(f"New best val_dice={self.best_val_dice:.4f}; saved to {ckpt_path}")
             else:
-                epochs_without_improvement += 1
+                self.epochs_without_improvement += 1
 
             save_rows_csv(self.history, self.output_dir / "history.csv")
             save_json(self.history, self.output_dir / "history.json")
+            self._save_last(epoch)
 
-            if self.early_stopping_patience is not None and epochs_without_improvement >= self.early_stopping_patience:
-                logger.info(f"Early stopping after {epochs_without_improvement} epochs without improvement.")
+            if self.early_stopping_patience is not None and self.epochs_without_improvement >= self.early_stopping_patience:
+                logger.info(f"Early stopping after {self.epochs_without_improvement} epochs without improvement.")
                 break
 
         if self.writer is not None:

@@ -59,7 +59,7 @@ def build_dataloaders(cfg: dict) -> tuple[DataLoader, DataLoader]:
     )
 
 
-def main(config_path: str = "configs/default.yaml") -> list[dict]:
+def main(config_path: str = "configs/default.yaml", resume: str | None = None) -> list[dict]:
     cfg = load_config(config_path)
     set_seed(cfg["experiment"]["seed"])
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -91,6 +91,29 @@ def main(config_path: str = "configs/default.yaml") -> list[dict]:
             eta_min=cfg["training"].get("min_lr", 1e-6),
         )
 
+    start_epoch = 1
+    resume_state = None
+    if resume:
+        ckpt = torch.load(resume, map_location=device)
+        model.load_state_dict(ckpt["model_state_dict"])
+        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        start_epoch = ckpt["epoch"] + 1
+        if scheduler is not None:
+            if "scheduler_state_dict" in ckpt:
+                scheduler.load_state_dict(ckpt["scheduler_state_dict"])
+            else:  # older _best.pth without scheduler state — fast-forward instead
+                for _ in range(ckpt["epoch"]):
+                    scheduler.step()
+        resume_state = {
+            "best_val_dice": ckpt.get("best_val_dice", ckpt.get("val_dice", -1.0)),
+            "epochs_without_improvement": ckpt.get("epochs_without_improvement", 0),
+            "history": ckpt.get("history", []),
+        }
+        print(
+            f"Resumed from {resume} (epoch {ckpt['epoch']}, "
+            f"val_dice={resume_state['best_val_dice']:.4f}) — continuing from epoch {start_epoch}"
+        )
+
     train_loader, val_loader = build_dataloaders(cfg)
     print(f"Train batches: {len(train_loader)} | Val batches: {len(val_loader)}")
 
@@ -108,7 +131,11 @@ def main(config_path: str = "configs/default.yaml") -> list[dict]:
         early_stopping_patience=cfg["training"].get("early_stopping_patience"),
         tensorboard=cfg.get("logging", {}).get("tensorboard", False),
     )
-    history = trainer.fit(train_loader, val_loader, epochs=cfg["training"]["epochs"])
+    if resume_state is not None:
+        trainer.best_val_dice = resume_state["best_val_dice"]
+        trainer.epochs_without_improvement = resume_state["epochs_without_improvement"]
+        trainer.history = resume_state["history"]
+    history = trainer.fit(train_loader, val_loader, epochs=cfg["training"]["epochs"], start_epoch=start_epoch)
     print(f"\nBest val Dice: {trainer.best_val_dice:.4f}")
     return history
 
@@ -116,5 +143,6 @@ def main(config_path: str = "configs/default.yaml") -> list[dict]:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/default.yaml")
+    parser.add_argument("--resume", default=None, help="Path to checkpoint .pth to resume from")
     args = parser.parse_args()
-    main(args.config)
+    main(args.config, resume=args.resume)
