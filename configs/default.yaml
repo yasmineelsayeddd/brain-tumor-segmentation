@@ -23,7 +23,7 @@ model:
 checkpoint_dir: checkpoints/
 
 training:
-  epochs: 100
+  epochs: 60
   optimizer: adam
   lr: 1.0e-3
   weight_decay: 1.0e-5
@@ -32,7 +32,7 @@ training:
   augment: true
   dice_weight: 0.5
   ce_weight: 0.5
-  early_stopping_patience: 15
+  early_stopping_patience: 8
 
 evaluation:
   metrics: [dice, iou, hd95, accuracy]

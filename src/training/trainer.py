@@ -8,11 +8,11 @@ from typing import Any
 
 import torch
 import torch.nn as nn
+from torch.cuda.amp import GradScaler, autocast
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
 
-from src.evaluation.metrics import mean_dice, pixel_accuracy
 from src.utils.artifacts import experiment_dir, save_json, save_rows_csv, save_yaml
 from src.utils.logging import setup_logger
 
@@ -20,7 +20,7 @@ logger = setup_logger("trainer")
 
 
 class Trainer:
-    """Generic segmentation trainer with standardized artifacts."""
+    """Generic segmentation trainer with AMP and GPU-side metrics."""
 
     def __init__(
         self,
@@ -51,13 +51,14 @@ class Trainer:
         self.best_val_dice = -1.0
         self.history: list[dict[str, Any]] = []
         self.writer = None
+        # AMP scaler — no-op on CPU
+        self.scaler = GradScaler() if device == "cuda" else None
 
         if config is not None:
             save_yaml(config, self.output_dir / "config.yaml")
         if tensorboard:
             try:
                 from torch.utils.tensorboard import SummaryWriter
-
                 self.writer = SummaryWriter(log_dir=str(self.output_dir / "tensorboard"))
             except ImportError:
                 logger.warning("TensorBoard requested but unavailable; continuing without it.")
@@ -65,32 +66,53 @@ class Trainer:
     def _run_epoch(self, loader: DataLoader, train: bool) -> dict[str, float]:
         self.model.train(train)
         total_loss = 0.0
-        total_dice = 0.0
-        total_acc = 0.0
         n_batches = 0
-        ctx = torch.enable_grad() if train else torch.no_grad()
 
+        # Accumulate dice + accuracy on GPU — avoids 1026 CPU transfers per epoch
+        dice_num = torch.zeros(self.num_classes - 1, device=self.device)
+        dice_den = torch.zeros(self.num_classes - 1, device=self.device)
+        correct = torch.tensor(0, device=self.device)
+        total_px = torch.tensor(0, device=self.device)
+
+        ctx = torch.enable_grad() if train else torch.no_grad()
         with ctx:
             for images, masks in loader:
                 images = images.to(self.device, non_blocking=True)
-                masks = masks.to(self.device, non_blocking=True)
-                logits = self.model(images)
-                loss = self.criterion(logits, masks)
+                masks  = masks.to(self.device, non_blocking=True)
+
+                with autocast(enabled=self.scaler is not None):
+                    logits = self.model(images)
+                    loss   = self.criterion(logits, masks)
 
                 if train:
                     self.optimizer.zero_grad(set_to_none=True)
-                    loss.backward()
-                    self.optimizer.step()
+                    if self.scaler is not None:
+                        self.scaler.scale(loss).backward()
+                        self.scaler.step(self.optimizer)
+                        self.scaler.update()
+                    else:
+                        loss.backward()
+                        self.optimizer.step()
 
                 preds = logits.argmax(dim=1)
                 total_loss += loss.item()
-                total_dice += mean_dice(preds.cpu(), masks.cpu(), self.num_classes)
-                total_acc += pixel_accuracy(preds.cpu(), masks.cpu())
-                n_batches += 1
+                n_batches  += 1
+
+                # GPU-side metrics (no .cpu() call per batch)
+                for i, c in enumerate(range(1, self.num_classes)):
+                    pred_c = preds == c
+                    mask_c = masks == c
+                    dice_num[i] += 2.0 * (pred_c & mask_c).sum()
+                    dice_den[i] += pred_c.sum() + mask_c.sum()
+                correct  += (preds == masks).sum()
+                total_px += masks.numel()
 
         if n_batches == 0:
             raise ValueError("DataLoader produced zero batches")
-        return {"loss": total_loss / n_batches, "dice": total_dice / n_batches, "acc": total_acc / n_batches}
+
+        dice = ((dice_num + 1e-6) / (dice_den + 1e-6)).mean().item()
+        acc  = (correct / total_px).item()
+        return {"loss": total_loss / n_batches, "dice": dice, "acc": acc}
 
     def _save_checkpoint(self, epoch: int) -> Path:
         ckpt_path = self.checkpoint_dir / f"{self.experiment_name}_best.pth"
@@ -114,7 +136,6 @@ class Trainer:
         epochs: int,
         experiment_name: str | None = None,
     ) -> list[dict[str, Any]]:
-        """Run the full training loop and save history artifacts."""
         if experiment_name is not None and experiment_name != self.experiment_name:
             self.experiment_name = experiment_name
 
@@ -122,20 +143,20 @@ class Trainer:
         for epoch in range(1, epochs + 1):
             t0 = time.time()
             train_metrics = self._run_epoch(train_loader, train=True)
-            val_metrics = self._run_epoch(val_loader, train=False)
+            val_metrics   = self._run_epoch(val_loader,   train=False)
             if self.scheduler is not None:
                 self.scheduler.step()
 
             record = {
-                "epoch": epoch,
+                "epoch":      epoch,
                 "train_loss": train_metrics["loss"],
                 "train_dice": train_metrics["dice"],
-                "train_acc": train_metrics["acc"],
-                "val_loss": val_metrics["loss"],
-                "val_dice": val_metrics["dice"],
-                "val_acc": val_metrics["acc"],
-                "lr": self.optimizer.param_groups[0]["lr"],
-                "elapsed_s": time.time() - t0,
+                "train_acc":  train_metrics["acc"],
+                "val_loss":   val_metrics["loss"],
+                "val_dice":   val_metrics["dice"],
+                "val_acc":    val_metrics["acc"],
+                "lr":         self.optimizer.param_groups[0]["lr"],
+                "elapsed_s":  time.time() - t0,
             }
             self.history.append(record)
 

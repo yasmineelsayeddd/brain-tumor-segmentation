@@ -35,20 +35,25 @@ def build_dataloaders(cfg: dict) -> tuple[DataLoader, DataLoader]:
     train_ds = BraTSDataset(cfg["data"]["data_root"], patient_ids=split["train"], transform=train_transform)
     val_ds = BraTSDataset(cfg["data"]["data_root"], patient_ids=split["val"], transform=None)
     pin = torch.cuda.is_available()
+    nw  = cfg["data"].get("num_workers", 4)
     return (
         DataLoader(
             train_ds,
             batch_size=cfg["data"]["batch_size"],
             shuffle=True,
-            num_workers=cfg["data"].get("num_workers", 2),
+            num_workers=nw,
             pin_memory=pin,
+            persistent_workers=nw > 0,
+            prefetch_factor=4 if nw > 0 else None,
         ),
         DataLoader(
             val_ds,
             batch_size=cfg["data"]["batch_size"],
             shuffle=False,
-            num_workers=cfg["data"].get("num_workers", 2),
+            num_workers=nw,
             pin_memory=pin,
+            persistent_workers=nw > 0,
+            prefetch_factor=4 if nw > 0 else None,
         ),
     )
 
