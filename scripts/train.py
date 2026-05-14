@@ -34,8 +34,9 @@ def build_dataloaders(cfg: dict) -> tuple[DataLoader, DataLoader]:
         train_transform = AlbumentationsWrapper(get_train_transforms(cfg["data"]["image_size"]))
     train_ds = BraTSDataset(cfg["data"]["data_root"], patient_ids=split["train"], transform=train_transform)
     val_ds = BraTSDataset(cfg["data"]["data_root"], patient_ids=split["val"], transform=None)
+    import os as _os
     pin = torch.cuda.is_available()
-    nw  = cfg["data"].get("num_workers", 4)
+    nw  = min(cfg["data"].get("num_workers", 4), _os.cpu_count() or 2)
     return (
         DataLoader(
             train_ds,

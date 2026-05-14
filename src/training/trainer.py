@@ -8,7 +8,7 @@ from typing import Any
 
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
@@ -52,7 +52,7 @@ class Trainer:
         self.history: list[dict[str, Any]] = []
         self.writer = None
         # AMP scaler — no-op on CPU
-        self.scaler = GradScaler() if device == "cuda" else None
+        self.scaler = GradScaler("cuda") if device == "cuda" else None
 
         if config is not None:
             save_yaml(config, self.output_dir / "config.yaml")
@@ -80,7 +80,7 @@ class Trainer:
                 images = images.to(self.device, non_blocking=True)
                 masks  = masks.to(self.device, non_blocking=True)
 
-                with autocast(enabled=self.scaler is not None):
+                with autocast("cuda", enabled=self.scaler is not None):
                     logits = self.model(images)
                     loss   = self.criterion(logits, masks)
 
