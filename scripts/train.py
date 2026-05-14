@@ -96,7 +96,8 @@ def main(config_path: str = "configs/default.yaml", resume: str | None = None) -
     if resume:
         ckpt = torch.load(resume, map_location=device)
         model.load_state_dict(ckpt["model_state_dict"])
-        optimizer.load_state_dict(ckpt["optimizer_state_dict"])
+        if "optimizer_state_dict" in ckpt:
+            optimizer.load_state_dict(ckpt["optimizer_state_dict"])
         start_epoch = ckpt["epoch"] + 1
         if scheduler is not None:
             if "scheduler_state_dict" in ckpt:
